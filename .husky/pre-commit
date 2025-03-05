@@ -1,6 +1,3 @@
-echo 'Checking and fixing any ESLint Errors 👷🏗️'
+echo 'Prettifying code and checking and fixing any ESLint Errors 👷🎨'
 
-pnpm run fix-lint
-
-echo 'Prettifying the code and double checking for any remaining linter errors🎨'
-pnpm run lint
+pnpm run lint --fix
