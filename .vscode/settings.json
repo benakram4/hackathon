@@ -8,5 +8,10 @@
 	"files.associations": {
 		"*.css": "tailwindcss"
 	},
-	"github.copilot.editor.enableAutoCompletions": true
+	"github.copilot.editor.enableAutoCompletions": true,
+	"github.copilot.chat.reviewSelection.instructions": [
+		{
+			"text": "Aspire to use the following when:  react 19, react server component, nextjs 15, tailwind, shadcn, react query. "
+		}
+	]
 }
