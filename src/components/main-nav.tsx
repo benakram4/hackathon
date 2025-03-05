@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Leaf, Menu, Search, ShoppingCart, User } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
 	NavigationMenu,
@@ -26,9 +26,9 @@ import {
 import { cn } from "@/lib/utils";
 
 export default function MainNav() {
-	// const pathname = usePathname();
 	const [isScrolled, setIsScrolled] = useState(false);
 	const [cartCount, setCartCount] = useState(0);
+	const [isSearchOpen, setIsSearchOpen] = useState(false);
 
 	// Handle scroll effect for fixed navigation
 	useEffect(() => {
@@ -137,6 +137,7 @@ export default function MainNav() {
 							size="icon"
 							aria-label="Search"
 							className="md:hidden"
+							onClick={() => setIsSearchOpen(true)}
 						>
 							<Search className="h-5 w-5" />
 						</Button>
@@ -242,6 +243,20 @@ export default function MainNav() {
 					</div>
 				</div>
 			</div>
+			{/* Mobile Search Dialog */}
+			<Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+				<DialogContent className="sm:max-w-[100%] w-[90%] p-0 bg-transparent border-none shadow-none">
+					<div className="relative w-full px-4 py-4">
+						<Search className="absolute left-6 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+						<Input
+							type="search"
+							placeholder="Search sustainable products..."
+							className="w-[calc(100%-2rem)] mx-4 pl-10 pr-4 py-8 text-lg bg-transparent border-none rounded-md ring-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+							autoFocus
+						/>
+					</div>
+				</DialogContent>
+			</Dialog>
 		</header>
 	);
 }
