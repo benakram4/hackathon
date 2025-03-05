@@ -1,3 +1,3 @@
 echo 'Prettifying code and checking and fixing any ESLint Errors 👷🎨'
 
-pnpm run lint --fix
+pnpm lint-staged

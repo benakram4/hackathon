@@ -1,5 +1,6 @@
+import { includeIgnoreFile } from "@eslint/compat";
 import { FlatCompat } from "@eslint/eslintrc";
-import { dirname } from "path";
+import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 
 /*
@@ -10,6 +11,7 @@ https://www.youtube.com/watch?v=Mloeq7mvI00
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const gitignorePath = resolve(__dirname, "./.gitignore");
 
 const compat = new FlatCompat({
 	baseDirectory: __dirname,
@@ -35,6 +37,7 @@ const eslintConfig = [
 					tabWidth: 2,
 					printWidth: 80,
 					trailingComma: "es5",
+					bracketSameLine: true,
 					endOfLine: "auto",
 					importOrder: [
 						"^(react|next?/?([a-zA-Z/]*))$",
@@ -45,8 +48,8 @@ const eslintConfig = [
 					importOrderSeparation: true,
 					importOrderSortSpecifiers: true,
 					plugins: [
-						"prettier-plugin-tailwindcss",
 						"@trivago/prettier-plugin-sort-imports",
+						"prettier-plugin-tailwindcss",
 					],
 				},
 				{
@@ -55,6 +58,7 @@ const eslintConfig = [
 			],
 		},
 	}),
+	includeIgnoreFile(gitignorePath),
 ];
 
 export default eslintConfig;

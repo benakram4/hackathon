@@ -9,9 +9,10 @@ export default function Home() {
 				<section className="py-12 md:py-24">
 					<div className="text-center">
 						<h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-							Shop Smarter, <span className="text-green-600">Live Greener</span>
+							Shop Smarter,
+							<span className="text-green-600">Live Greener</span>
 						</h1>
-						<p className="mt-6 text-lg text-muted-foreground max-w-3xl mx-auto">
+						<p className="text-muted-foreground mx-auto mt-6 max-w-3xl text-lg">
 							Add your regular items from retailers like Walmart and Amazon to
 							your cart. We&apos;ll suggest healthier, more sustainable
 							alternatives that are better for you and the planet.
