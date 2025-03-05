@@ -3,4 +3,4 @@ echo 'Checking and fixing any ESLint Errors 👷🏗️'
 pnpm run fix-lint
 
 echo 'Prettifying the code 🎨'
-pnpm run format
+pnpm run lint
