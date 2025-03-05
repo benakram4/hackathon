@@ -47,17 +47,16 @@ export default function MainNav() {
 	return (
 		<header
 			className={cn(
-				"fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+				"fixed top-0 right-0 left-0 z-50 transition-all duration-300",
 				isScrolled
-					? "bg-white/95 backdrop-blur-sm shadow-sm dark:bg-gray-950/95"
+					? "bg-white/95 shadow-sm backdrop-blur-sm dark:bg-gray-950/95"
 					: "bg-white dark:bg-gray-950"
-			)}
-		>
+			)}>
 			<div className="container mx-auto px-4">
 				<div className="flex h-16 items-center justify-between">
 					{/* Logo */}
 					<Link href="/" className="flex items-center space-x-2">
-						<Leaf className="h-6 w-6 text-primary" />
+						<Leaf className="text-primary h-6 w-6" />
 						<span className="text-xl font-semibold">EcoEats</span>
 					</Link>
 
@@ -76,12 +75,11 @@ export default function MainNav() {
 													<NavigationMenuLink asChild>
 														<Link
 															href={category.href}
-															className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-														>
-															<div className="text-sm font-medium leading-none">
+															className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block space-y-1 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none">
+															<div className="text-sm leading-none font-medium">
 																{category.title}
 															</div>
-															<p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+															<p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
 																{category.description}
 															</p>
 														</Link>
@@ -102,12 +100,11 @@ export default function MainNav() {
 													<NavigationMenuLink asChild>
 														<Link
 															href={item.href}
-															className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-														>
-															<div className="text-sm font-medium leading-none">
+															className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block space-y-1 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none">
+															<div className="text-sm leading-none font-medium">
 																{item.title}
 															</div>
-															<p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+															<p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
 																{item.description}
 															</p>
 														</Link>
@@ -123,12 +120,12 @@ export default function MainNav() {
 
 					{/* Search, Account, Cart */}
 					<div className="flex items-center space-x-4">
-						<div className="hidden md:block relative w-full max-w-xs">
-							<Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+						<div className="relative hidden w-full max-w-xs md:block">
+							<Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
 							<Input
 								type="search"
 								placeholder="Search sustainable products..."
-								className="w-full rounded-full bg-muted pl-8 md:w-[200px] lg:w-[250px] focus-visible:ring-green-500"
+								className="bg-muted w-full rounded-full pl-8 focus-visible:ring-green-500 md:w-[200px] lg:w-[250px]"
 							/>
 						</div>
 
@@ -137,8 +134,7 @@ export default function MainNav() {
 							size="icon"
 							aria-label="Search"
 							className="md:hidden"
-							onClick={() => setIsSearchOpen(true)}
-						>
+							onClick={() => setIsSearchOpen(true)}>
 							<Search className="h-5 w-5" />
 						</Button>
 
@@ -150,11 +146,10 @@ export default function MainNav() {
 							variant="ghost"
 							size="icon"
 							aria-label="Shopping cart"
-							className="relative"
-						>
+							className="relative">
 							<ShoppingCart className="h-5 w-5" />
 							{cartCount > 0 && (
-								<Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary p-0 text-xs flex items-center justify-center">
+								<Badge className="bg-primary absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs">
 									{cartCount}
 								</Badge>
 							)}
@@ -167,27 +162,26 @@ export default function MainNav() {
 									variant="ghost"
 									size="icon"
 									className="md:hidden"
-									aria-label="Menu"
-								>
+									aria-label="Menu">
 									<Menu className="h-5 w-5" />
 								</Button>
 							</SheetTrigger>
 							<SheetContent side="right" className="w-[300px] sm:w-[350px]">
 								<SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-								<div className="flex flex-col h-full">
+								<div className="flex h-full flex-col">
 									<div className="px-4 py-6">
 										<div className="mb-4 flex items-center justify-between">
 											<Link href="/" className="flex items-center space-x-2">
-												<Leaf className="h-6 w-6 text-primary" />
+												<Leaf className="text-primary h-6 w-6" />
 												<span className="text-xl font-semibold">EcoEats</span>
 											</Link>
 										</div>
 										<div className="relative mb-6">
-											<Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+											<Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
 											<Input
 												type="search"
 												placeholder="Search sustainable products..."
-												className="w-full rounded-full bg-muted pl-8"
+												className="bg-muted w-full rounded-full pl-8"
 											/>
 										</div>
 										<nav className="flex flex-col space-y-6">
@@ -198,8 +192,7 @@ export default function MainNav() {
 														<li key={category.title}>
 															<Link
 																href={category.href}
-																className="text-muted-foreground hover:text-foreground"
-															>
+																className="text-muted-foreground hover:text-foreground">
 																{category.title}
 															</Link>
 														</li>
@@ -215,8 +208,7 @@ export default function MainNav() {
 														<li key={item.title}>
 															<Link
 																href={item.href}
-																className="text-muted-foreground hover:text-foreground"
-															>
+																className="text-muted-foreground hover:text-foreground">
 																{item.title}
 															</Link>
 														</li>
@@ -245,13 +237,13 @@ export default function MainNav() {
 			</div>
 			{/* Mobile Search Dialog */}
 			<Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
-				<DialogContent className="sm:max-w-[100%] w-[90%] p-0 bg-transparent border-none shadow-none">
+				<DialogContent className="w-[90%] border-none bg-transparent p-0 shadow-none sm:max-w-[100%]">
 					<div className="relative w-full px-4 py-4">
-						<Search className="absolute left-6 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+						<Search className="text-muted-foreground absolute top-1/2 left-6 h-5 w-5 -translate-y-1/2 transform" />
 						<Input
 							type="search"
 							placeholder="Search sustainable products..."
-							className="w-[calc(100%-2rem)] mx-4 pl-10 pr-4 py-8 text-lg bg-transparent border-none rounded-md ring-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+							className="mx-4 w-[calc(100%-2rem)] rounded-md border-none bg-transparent py-8 pr-4 pl-10 text-lg ring-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0"
 							autoFocus
 						/>
 					</div>
