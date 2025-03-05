@@ -1,17 +1,17 @@
 {
-	"editor.formatOnSave": true,
-	"editor.codeActionsOnSave": {
-		"source.fixAll.eslint": "always",
-		"source.organizeImports": "always"
-	},
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"files.associations": {
-		"*.css": "tailwindcss"
-	},
-	"github.copilot.editor.enableAutoCompletions": true,
-	"github.copilot.chat.reviewSelection.instructions": [
-		{
-			"text": "Aspire to use the following when:  react 19, react server component, nextjs 15, tailwind, shadcn, react query. "
-		}
-	]
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "always",
+        "source.organizeImports": "always"
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "files.associations": {
+        "*.css": "tailwindcss"
+    },
+    "github.copilot.editor.enableAutoCompletions": true,
+    "github.copilot.chat.reviewSelection.instructions": [
+        {
+            "text": "Aspire to use the following when:  react 19, react server component, nextjs 15, tailwind, shadcn, react query. "
+        }
+    ]
 }
