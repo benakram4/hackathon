@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import MainNav from "@/components/main-nav";
 import { Button } from "@/components/ui/button";
 
+const url = process.env.NEXT_PUBLIC_PROD_URL || "http://localhost:3000";
+
 export default function Home() {
 	// TODO this us just for testing we should NOT so much data in the state (2.65MB) which could be fetched in teh server
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -13,9 +15,7 @@ export default function Home() {
 	useEffect(() => {
 		const fetchCategories = async () => {
 			try {
-				const response = await fetch(
-					"http://localhost:3000/api/walmart/categories"
-				);
+				const response = await fetch(`${url}/api/walmart/categories`);
 				const result = await response.json();
 				setData(result);
 			} catch (error) {
@@ -56,7 +56,7 @@ export default function Home() {
 						<div>
 							<h2 className="text-2xl font-bold">Categories</h2>
 							<ul>
-								{data.categories.map(
+								{data?.categories?.map(
 									(category: { id: string; name: string }) => (
 										<li key={category.id}>{category.name}</li>
 									)
