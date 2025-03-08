@@ -7,12 +7,16 @@ import { Provider as JotaiProvider } from "jotai";
 
 import { getQueryClient } from "@/providers/get-query-client";
 
+import { PostHogProvider } from "./posthog";
+
 export default function Providers({ children }: { children: React.ReactNode }) {
 	const queryClient = getQueryClient();
 
 	return (
-		<QueryClientProvider client={queryClient}>
-			<JotaiProvider>{children}</JotaiProvider>
-		</QueryClientProvider>
+		<PostHogProvider>
+			<QueryClientProvider client={queryClient}>
+				<JotaiProvider>{children}</JotaiProvider>
+			</QueryClientProvider>
+		</PostHogProvider>
 	);
 }
