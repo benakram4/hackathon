@@ -7,6 +7,7 @@ import { Provider as JotaiProvider } from "jotai";
 
 import { getQueryClient } from "@/providers/get-query-client";
 
+import { OFFProvider } from "./off-provider";
 import { PostHogProvider } from "./posthog";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -15,7 +16,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 	return (
 		<PostHogProvider>
 			<QueryClientProvider client={queryClient}>
-				<JotaiProvider>{children}</JotaiProvider>
+				<JotaiProvider>
+					<OFFProvider>{children}</OFFProvider>
+				</JotaiProvider>
 			</QueryClientProvider>
 		</PostHogProvider>
 	);

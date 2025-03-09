@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 
+import OpenFoodFacts from "@/lib/off/src/main";
 import { generateWalmartHeaders } from "@/lib/walmart-signature";
 
 // TODO Just for testing, if we need this data this should be done in server component
 export async function GET() {
 	try {
+		const client = new OpenFoodFacts(fetch, { country: "Canada" });
+		const test = await client.getProduct("5000112546415");
+		console.log("xxxxxxxxxx", test);
 		const consumerId = process.env.WALMART_CONSUMER_ID || "";
 		const privateKeyVersion = process.env.WALMART_KEY_VERSION || "";
 		const privateKeyPem = process.env.WALMART_PRIVATE_KEY || "";

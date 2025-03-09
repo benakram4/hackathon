@@ -8,7 +8,12 @@
 		"start": "next start",
 		"lint": "next lint",
 		"lint-staged": "lint-staged",
-		"prepare": "husky"
+		"prepare": "husky",
+		"api": "pnpm run api:folksonomy && pnpm run api:robotoff && pnpm run api:server:v2",
+		"api:server:v2": "openapi-typescript 'https://raw.githubusercontent.com/openfoodfacts/openfoodfacts-server/main/docs/api/ref/api.yml' --output src/schemas/server/v2.ts",
+		"api:robotoff": "openapi-typescript https://raw.githubusercontent.com/openfoodfacts/robotoff/main/doc/references/api.yml --output src/schemas/robotoff.ts",
+		"api:folksonomy": "openapi-typescript https://api.folksonomy.openfoodfacts.org/openapi.json --output src/schemas/folksonomy.ts",
+		"api:nutripatrol": "openapi-typescript https://nutripatrol.openfoodfacts.org/api/openapi.json --output src/schemas/nutripatrol.ts"
 	},
 	"dependencies": {
 		"@radix-ui/react-avatar": "^1.1.3",
@@ -22,6 +27,7 @@
 		"lucide-react": "^0.477.0",
 		"next": "15.2.1",
 		"next-themes": "^0.4.4",
+		"openapi-fetch": "^0.13.4",
 		"posthog-js": "^1.229.5",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
@@ -45,6 +51,7 @@
 		"eslint-plugin-prettier": "^5.2.3",
 		"husky": "^9.1.7",
 		"lint-staged": "^15.4.3",
+		"openapi-typescript": "^7.6.1",
 		"prettier-plugin-tailwindcss": "^0.6.11",
 		"tailwindcss": "^4",
 		"typescript": "^5"
