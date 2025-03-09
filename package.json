@@ -7,7 +7,7 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
-    "lint-staged": "lint-staged",
+		"lint-staged": "lint-staged",
 		"prepare": "husky"
 	},
 	"dependencies": {
@@ -22,6 +22,7 @@
 		"lucide-react": "^0.477.0",
 		"next": "15.2.1",
 		"next-themes": "^0.4.4",
+		"posthog-js": "^1.229.5",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"react-scan": "^0.2.8",
