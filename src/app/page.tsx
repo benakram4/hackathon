@@ -1,38 +1,7 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
 import MainNav from "@/components/main-nav";
 import { Button } from "@/components/ui/button";
-import { useUser } from "@/lib/context/user";
 
-const url = process.env.NEXT_PUBLIC_PROD_URL || "http://localhost:3000";
-
-export default function Home() {
-	// TODO this us just for testing we should NOT so much data in the state (2.65MB) which could be fetched in teh server
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const [data, setData] = useState<any>(null);
-	const { user } = useUser();
-
-	useEffect(() => {
-		const fetchCategories = async () => {
-			try {
-				const response = await fetch(`${url}/api/walmart/categories`);
-				const result = await response.json();
-				setData(result);
-			} catch (error) {
-				console.error("Error fetching categories:", error);
-			}
-		};
-
-		fetchCategories();
-	}, []);
-	// console.log("XXXX", data);
-
-	useEffect(() => {
-		console.log("User info: ", user);
-	}, [user]);
-
+export default async function Home() {
 	return (
 		<div className="min-h-screen">
 			<MainNav />
@@ -58,20 +27,7 @@ export default function Home() {
 						</div>
 					</div>
 				</section>
-				<div>
-					{data && (
-						<div>
-							<h2 className="text-2xl font-bold">Categories</h2>
-							<ul>
-								{data?.categories?.map(
-									(category: { id: string; name: string }) => (
-										<li key={category.id}>{category.name}</li>
-									)
-								)}
-							</ul>
-						</div>
-					)}
-				</div>
+				<div></div>
 			</main>
 		</div>
 	);
