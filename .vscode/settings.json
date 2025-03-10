@@ -12,5 +12,8 @@
 		{
 			"text": "Aspire to use the following when:  react 19, react server component, nextjs 15, tailwind, shadcn, react query. "
 		}
+	],
+	"cSpell.words": [
+		"appwrite"
 	]
 }

@@ -139,7 +139,9 @@ export default function MainNav() {
 						</Button>
 
 						<Button variant="ghost" size="icon" aria-label="Account">
-							<User className="h-5 w-5" />
+							<Link href="/login">
+								<User className="h-5 w-5" />
+							</Link>
 						</Button>
 
 						<Button

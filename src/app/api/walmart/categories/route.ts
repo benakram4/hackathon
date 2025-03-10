@@ -9,7 +9,7 @@ export async function GET() {
 		const privateKeyVersion = process.env.WALMART_KEY_VERSION || "";
 		const privateKeyPem = process.env.WALMART_PRIVATE_KEY || "";
 
-		console.log("privateKeyPem", privateKeyPem);
+		// console.log("privateKeyPem", privateKeyPem);
 
 		const headers = generateWalmartHeaders(
 			consumerId,
