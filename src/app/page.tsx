@@ -1,57 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import MainNav from "@/components/main-nav";
 import { Button } from "@/components/ui/button";
-import { ProductV2 } from "@/lib/off/src/main";
-import { useOFF } from "@/providers/off-provider";
-
-const url = process.env.NEXT_PUBLIC_PROD_URL || "http://localhost:3000";
+import { useProductOFF } from "@/hooks/off";
+import { useWalmartCategories } from "@/hooks/walmart";
 
 export default function Home() {
 	// TODO this us just for testing we should NOT so much data in the state (2.65MB) which could be fetched in teh server
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const [data, setData] = useState<any>(null);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
-	const [offData, setOffData] = useState<ProductV2 | null>(null);
-	const off = useOFF();
 
-	useEffect(() => {
-		const fetchProduct = async () => {
-			try {
-				setLoading(true);
-				setError(null);
-				const product = await off.getProduct("5000112546415");
-				console.log("Raw product data:", product);
-				if (product) {
-					setOffData(product);
-				} else {
-					setError("Product not found");
-				}
-			} catch (err) {
-				console.error("Error fetching from off:", err);
-				setError(err instanceof Error ? err.message : "Unknown error");
-			} finally {
-				setLoading(false);
-			}
-		};
-		const fetchCategories = async () => {
-			try {
-				const response = await fetch(`${url}/api/walmart/categories`);
-				const result = await response.json();
-				setData(result);
-			} catch (error) {
-				console.error("Error fetching categories:", error);
-			}
-		};
+	const {
+		data: offProduct,
+		isLoading: offProductLoading,
+		error: offProductError,
+	} = useProductOFF("5000112546415");
 
-		fetchCategories();
-		fetchProduct();
-	}, [off]);
-	console.log("xxxxxxxxxx", offData?.image_front_small_url);
-	console.log("XXXX", data);
+	// TODO populate this on the server side, we will need to use this to populate the nav bar
+	const {
+		data: categoriesData,
+		isLoading: categoriesLoading,
+		error: categoriesError,
+	} = useWalmartCategories();
+
 	return (
 		<div className="min-h-screen">
 			<MainNav />
@@ -78,39 +47,52 @@ export default function Home() {
 					</div>
 				</section>
 				<div>
-					{loading && <div>Loading product data...</div>}
-					{error && <div className="text-red-500">Error: {error}</div>}
-					{offData && (
+					{offProductLoading && <div>Loading product data...</div>}
+					{offProductError && (
+						<div className="text-red-500">Error: {offProductError.message}</div>
+					)}
+					{offProduct && (
 						<div>
 							<h2 className="text-2xl font-bold">Product</h2>
 							<p className="text-xl">
-								{offData.product_name ||
-									offData.product_name_en ||
+								{offProduct.product_name ||
+									offProduct.product_name_en ||
 									"No product name available"}
 							</p>
 							{/* You can also show the abbreviated name if available */}
-							{offData.abbreviated_product_name && (
+							{offProduct.abbreviated_product_name && (
 								<p className="text-sm text-gray-500">
-									Also known as: {offData.abbreviated_product_name}
+									Also known as: {offProduct.abbreviated_product_name}
 								</p>
 							)}
 							<pre className="max-h-64 overflow-auto bg-gray-100 p-2 text-xs">
-								{JSON.stringify(offData, null, 2)}
+								{JSON.stringify(offProduct, null, 2)}
 							</pre>
 						</div>
 					)}
-					{data && (
-						<div>
-							<h2 className="text-2xl font-bold">Categories</h2>
-							<ul>
-								{data?.categories?.map(
-									(category: { id: string; name: string }) => (
-										<li key={category.id}>{category.name}</li>
-									)
-								)}
-							</ul>
-						</div>
-					)}
+					<div>
+						{categoriesLoading && <div>Loading categories...</div>}
+						{categoriesError && (
+							<div className="text-red-500">Error loading categories</div>
+						)}
+						{categoriesData && (
+							<div>
+								<h2 className="text-2xl font-bold">Categories</h2>
+								<ul>
+									{categoriesData?.map(
+										(category: { id: string; name: string }) => (
+											<li key={category.id}>
+												{category.name} | {category.id}
+											</li>
+										)
+									)}
+								</ul>
+								<pre className="mb-6 max-h-[50rem] overflow-auto bg-gray-100 p-2 text-xs">
+									{JSON.stringify(categoriesData, null, 2)}
+								</pre>
+							</div>
+						)}
+					</div>
 				</div>
 			</main>
 		</div>
