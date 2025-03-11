@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { DialogTitle } from "@radix-ui/react-dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Leaf, Menu, Search, ShoppingCart, User } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -242,8 +244,11 @@ export default function MainNav() {
 			</div>
 			{/* Mobile Search Dialog */}
 			<Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
-				<DialogContent className="w-[90%] border-none bg-transparent p-0 shadow-none sm:max-w-[100%]">
-					<div className="relative w-full px-4 py-4">
+				<DialogContent className="w-[90%] border-none p-0 shadow-none sm:w-[80%] sm:max-w-[100%] md:w-[60%] lg:w-[40%]">
+					<VisuallyHidden>
+						<DialogTitle>Search Bar</DialogTitle>
+					</VisuallyHidden>
+					<div className="relative w-full rounded-lg border-r-3 border-b-3 border-gray-400 px-4 py-4 shadow-lg">
 						<Search className="text-muted-foreground absolute top-1/2 left-6 h-5 w-5 -translate-y-1/2 transform" />
 						<Input
 							type="search"
