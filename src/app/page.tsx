@@ -18,7 +18,7 @@ export default function Home() {
 					<div className="text-center">
 						<h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
 							Shop Smarter,
-							<span className="text-green-600">Live Greener</span>
+							<span className="text-primary">Live Greener</span>
 						</h1>
 						<p className="text-muted-foreground mx-auto mt-6 max-w-3xl text-lg">
 							Add your regular items from retailers like Walmart and Amazon to
@@ -26,9 +26,7 @@ export default function Home() {
 							alternatives that are better for you and the planet.
 						</p>
 						<div className="mt-8 flex justify-center gap-4">
-							<Button size="lg" className="bg-green-600 hover:bg-green-700">
-								Start Shopping
-							</Button>
+							<Button size="lg">Start Shopping</Button>
 							<Button size="lg" variant="outline">
 								How It Works
 							</Button>
@@ -38,7 +36,9 @@ export default function Home() {
 				<div>
 					{offProductLoading && <div>Loading product data...</div>}
 					{offProductError && (
-						<div className="text-red-500">Error: {offProductError.message}</div>
+						<div className="text-destructive">
+							Error: {offProductError.message}
+						</div>
 					)}
 					{offProduct && (
 						<div>
