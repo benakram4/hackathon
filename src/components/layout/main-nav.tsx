@@ -23,12 +23,16 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
+import { useWalmartCategories } from "@/hooks";
 import { cn } from "@/lib/utils";
+import { RELEVANT_CATEGORIES } from "@/lib/walmart/constants";
 
 export default function MainNav() {
 	const [isScrolled, setIsScrolled] = useState(false);
 	const [cartCount, setCartCount] = useState(0);
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+	const walmartCategories = useWalmartCategories();
 
 	// Handle scroll effect for fixed navigation
 	useEffect(() => {
@@ -70,22 +74,23 @@ export default function MainNav() {
 									</NavigationMenuTrigger>
 									<NavigationMenuContent>
 										<ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-											{shopCategories.map((category) => (
-												<li key={category.title}>
-													<NavigationMenuLink asChild>
-														<Link
-															href={category.href}
-															className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block space-y-1 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none">
-															<div className="text-sm leading-none font-medium">
-																{category.title}
-															</div>
-															<p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
-																{category.description}
-															</p>
-														</Link>
-													</NavigationMenuLink>
-												</li>
-											))}
+											{Array.isArray(walmartCategories?.data) &&
+												walmartCategories.data.map((category) => (
+													<li key={category.id}>
+														<NavigationMenuLink asChild>
+															<Link
+																href={"/"}
+																className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block space-y-1 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none">
+																<div className="text-sm leading-none font-medium">
+																	{category.name}
+																</div>
+																<p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
+																	{RELEVANT_CATEGORIES[category.id] ?? ""}
+																</p>
+															</Link>
+														</NavigationMenuLink>
+													</li>
+												))}
 										</ul>
 									</NavigationMenuContent>
 								</NavigationMenuItem>

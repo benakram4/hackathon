@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server";
 
 import { generateWalmartHeaders } from "@/lib/walmart-signature";
+import { RELEVANT_CATEGORIES } from "@/lib/walmart/constants";
+import { WalmartCategoriesResponse } from "@/types";
 
-// TODO Just for testing, if we need this data this should be done in server component
 export async function GET() {
 	try {
 		const consumerId = process.env.WALMART_CONSUMER_ID || "";
 		const privateKeyVersion = process.env.WALMART_KEY_VERSION || "";
 		const privateKeyPem = process.env.WALMART_PRIVATE_KEY || "";
-
-		console.log("privateKeyPem", privateKeyPem);
 
 		const headers = generateWalmartHeaders(
 			consumerId,
@@ -25,8 +24,11 @@ export async function GET() {
 			}
 		);
 
-		const data = await response.json();
-		return NextResponse.json(data);
+		const data: WalmartCategoriesResponse = await response.json();
+		const filteredCategories = data.categories.filter(
+			(category) => category && Object.hasOwn(RELEVANT_CATEGORIES, category.id)
+		);
+		return NextResponse.json(filteredCategories);
 	} catch (error) {
 		console.error("Error fetching categories:", error);
 		return NextResponse.json({ error: error }, { status: 500 });
