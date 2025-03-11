@@ -74,8 +74,8 @@ export default function MainNav() {
 									</NavigationMenuTrigger>
 									<NavigationMenuContent>
 										<ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-											{walmartCategories?.data &&
-												walmartCategories.data?.map((category) => (
+											{Array.isArray(walmartCategories?.data) &&
+												walmartCategories.data.map((category) => (
 													<li key={category.id}>
 														<NavigationMenuLink asChild>
 															<Link
