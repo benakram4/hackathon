@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { generateWalmartHeaders } from "@/lib/walmart-signature";
-import { RELEVANT_CATEGORIES } from "@/lib/walmart/constants";
-import { WalmartCategoriesResponse } from "@/types";
+import { WalmartItemsResponse } from "@/types";
 
 export async function GET() {
 	try {
@@ -17,20 +16,17 @@ export async function GET() {
 		);
 
 		const response = await fetch(
-			"https://developer.api.walmart.com/api-proxy/service/affil/product/v2/paginated/items",
+			"https://developer.api.walmart.com/api-proxy/service/affil/product/v2/paginated/items?category=976759&soldByWmt=true",
 			{
 				method: "GET",
 				headers,
 			}
 		);
 
-		const data: WalmartCategoriesResponse = await response.json();
-		const filteredCategories = data.categories.filter(
-			(category) => category && Object.hasOwn(RELEVANT_CATEGORIES, category.id)
-		);
-		return NextResponse.json(filteredCategories);
+		const data: WalmartItemsResponse = await response.json();
+		return NextResponse.json(data);
 	} catch (error) {
-		console.error("Error fetching categories:", error);
+		console.error("Error fetching items:", error);
 		return NextResponse.json({ error: error }, { status: 500 });
 	}
 }
