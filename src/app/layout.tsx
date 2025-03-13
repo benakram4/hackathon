@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 
+import Footer from "@/components/landing-page/footer";
 import { Layout as NavBar } from "@/components/layout";
 import Providers from "@/providers";
 
@@ -40,6 +41,7 @@ export default function RootLayout({
 				<Providers>
 					<NavBar />
 					<main className="pt-16">{children}</main>
+					<Footer />
 				</Providers>
 			</body>
 		</html>
