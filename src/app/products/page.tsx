@@ -25,7 +25,7 @@ export default async function PostsPage() {
 	);
 }
 
-async function getItems() {
+export async function getItems() {
 	const response = await fetch(`${baseUrl}/api/walmart/items`, {
 		method: "GET",
 	});

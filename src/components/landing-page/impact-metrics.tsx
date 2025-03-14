@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { CircleOff, Droplets, Sprout, Trees } from "lucide-react";
 
@@ -13,67 +13,44 @@ interface Stat {
 	color: string;
 }
 
-const stats: Stat[] = [
-	{
-		id: "co2",
-		icon: CircleOff,
-		value: 0,
-		end: 12475,
-		label: "kg CO₂ Saved",
-		color: "bg-emerald-500",
-	},
-	{
-		id: "trees",
-		icon: Trees,
-		value: 0,
-		end: 587,
-		label: "Trees Preserved",
-		color: "bg-green-600",
-	},
-	{
-		id: "water",
-		icon: Droplets,
-		value: 0,
-		end: 1250000,
-		label: "Liters of Water Saved",
-		color: "bg-blue-500",
-	},
-	{
-		id: "farms",
-		icon: Sprout,
-		value: 0,
-		end: 128,
-		label: "Local Farms Supported",
-		color: "bg-amber-500",
-	},
-];
-
 const ImpactMetrics = () => {
+	const stats: Stat[] = [
+		{
+			id: "co2",
+			icon: CircleOff,
+			value: 0,
+			end: 12475,
+			label: "kg CO₂ Saved",
+			color: "bg-emerald-500",
+		},
+		{
+			id: "trees",
+			icon: Trees,
+			value: 0,
+			end: 587,
+			label: "Trees Preserved",
+			color: "bg-green-600",
+		},
+		{
+			id: "water",
+			icon: Droplets,
+			value: 0,
+			end: 1250000,
+			label: "Liters of Water Saved",
+			color: "bg-blue-500",
+		},
+		{
+			id: "farms",
+			icon: Sprout,
+			value: 0,
+			end: 128,
+			label: "Local Farms Supported",
+			color: "bg-amber-500",
+		},
+	];
+
 	const [animatedStats, setAnimatedStats] = useState(stats);
 	const [hasAnimated, setHasAnimated] = useState(false);
-	const animateStats = useCallback(() => {
-		const duration = 2000; // animation duration in ms
-		const steps = 60; // number of steps to reach the target value
-		const interval = duration / steps;
-
-		let currentStep = 0;
-
-		const timer = setInterval(() => {
-			currentStep++;
-
-			setAnimatedStats((prevStats) =>
-				prevStats.map((stat) => ({
-					...stat,
-					value: Math.round((stat.end / steps) * currentStep),
-				}))
-			);
-
-			if (currentStep >= steps) {
-				clearInterval(timer);
-				setAnimatedStats(stats.map((stat) => ({ ...stat, value: stat.end })));
-			}
-		}, interval);
-	}, [stats]);
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -95,7 +72,31 @@ const ImpactMetrics = () => {
 		handleScroll(); // Check on mount
 
 		return () => window.removeEventListener("scroll", handleScroll);
-	}, [hasAnimated, animateStats]);
+	}, [hasAnimated]);
+
+	const animateStats = () => {
+		const duration = 2000; // animation duration in ms
+		const steps = 60; // number of steps to reach the target value
+		const interval = duration / steps;
+
+		let currentStep = 0;
+
+		const timer = setInterval(() => {
+			currentStep++;
+
+			setAnimatedStats((prevStats) =>
+				prevStats.map((stat) => ({
+					...stat,
+					value: Math.round((stat.end / steps) * currentStep),
+				}))
+			);
+
+			if (currentStep >= steps) {
+				clearInterval(timer);
+				setAnimatedStats(stats.map((stat) => ({ ...stat, value: stat.end })));
+			}
+		}, interval);
+	};
 
 	return (
 		<section
@@ -125,14 +126,19 @@ const ImpactMetrics = () => {
 						return (
 							<div
 								key={stat.id}
-								className="group bg-background relative rounded-2xl border p-6 text-center shadow-sm transition-shadow hover:shadow-md">
+								className="group relative rounded-2xl border bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md">
 								<div
 									className={cn(
 										"mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full",
-										"bg-opacity-10 text-background",
+										"bg-opacity-10 text-white",
 										stat.color
 									)}>
-									<Icon className={cn("h-8 w-8")} />
+									<Icon
+										className={cn(
+											"h-8 w-8",
+											stat.color.replace("bg-", "text-")
+										)}
+									/>
 								</div>
 								<h3 className="mb-1 text-3xl font-bold">
 									{stat.id === "water"

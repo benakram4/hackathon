@@ -109,7 +109,6 @@ const ProductShowcase = () => {
 							</div>
 						</div>
 						<div className="relative mb-6 aspect-[4/3] overflow-hidden rounded-lg">
-							{/* TODO change to next image when mock data changed */}
 							<img
 								src={currentAlternative.regularProduct.image}
 								alt={currentAlternative.regularProduct.name}
@@ -173,7 +172,6 @@ const ProductShowcase = () => {
 						</div>
 						<div className="relative mb-6 aspect-[4/3] overflow-hidden rounded-lg">
 							<div className="from-primary/10 absolute inset-0 z-10 bg-gradient-to-tr to-transparent" />
-							{/* TODO change to next image when mock data changed */}
 							<img
 								src={currentAlternative.sustainableAlternative.image}
 								alt={currentAlternative.sustainableAlternative.name}
