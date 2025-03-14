@@ -2,10 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getItems } from "@/app/products/page";
+import { getItems } from "@/lib/walmart/api";
 import { WalmartItem, WalmartItemsResponse } from "@/types/walmart";
 
-import ProductCard from "./ProductCard";
+import ProductCard from "./product-card";
 
 export default function ProductCards() {
 	const { data, error, isLoading } = useQuery<WalmartItemsResponse>({
