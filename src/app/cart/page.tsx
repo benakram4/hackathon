@@ -94,9 +94,10 @@ const Cart: React.FC = () => {
 		itemsToSwap.forEach((item) => {
 			const alternatives = findSwapAlternatives(item.product.id);
 
-			if (alternatives.length > 0) {
+			const alternative = alternatives[0];
+			if (alternatives.length > 0 && alternative) {
 				// Use the first alternative found
-				swapItem(item.product.id, alternatives[0]);
+				swapItem(item.product.id, alternative);
 				swappedCount++;
 			}
 		});
