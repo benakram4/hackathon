@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { useAtomValue } from "jotai";
 import { Leaf, Menu, Search, ShoppingCart, User } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -26,13 +28,17 @@ import {
 import { useWalmartCategories } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { RELEVANT_CATEGORIES } from "@/lib/walmart/constants";
+import { shoppingCartAtom } from "@/store";
 
 export default function MainNav() {
 	const [isScrolled, setIsScrolled] = useState(false);
-	const [cartCount, setCartCount] = useState(0);
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 
 	const walmartCategories = useWalmartCategories();
+
+	const shoppingCart = useAtomValue(shoppingCartAtom);
+
+	const router = useRouter();
 
 	// Handle scroll effect for fixed navigation
 	useEffect(() => {
@@ -41,11 +47,6 @@ export default function MainNav() {
 		};
 		window.addEventListener("scroll", handleScroll);
 		return () => window.removeEventListener("scroll", handleScroll);
-	}, []);
-
-	// Simulate cart count for demo purposes
-	useEffect(() => {
-		setCartCount(3);
 	}, []);
 
 	return (
@@ -151,11 +152,14 @@ export default function MainNav() {
 							variant="ghost"
 							size="icon"
 							aria-label="Shopping cart"
-							className="relative">
+							className="relative"
+							onClick={() => {
+								router.push("/cart");
+							}}>
 							<ShoppingCart className="h-5 w-5" />
-							{cartCount > 0 && (
+							{shoppingCart.length > 0 && (
 								<Badge className="bg-primary absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs">
-									{cartCount}
+									{shoppingCart.length}
 								</Badge>
 							)}
 						</Button>
@@ -230,7 +234,7 @@ export default function MainNav() {
 											</Button>
 											<Button>
 												<ShoppingCart className="mr-2 h-4 w-4" />
-												View Cart ({cartCount})
+												View Cart ({shoppingCart.length})
 											</Button>
 										</div>
 									</div>

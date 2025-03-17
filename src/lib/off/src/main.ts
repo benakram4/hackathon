@@ -24,7 +24,7 @@ import {
 } from "./taxonomy/types";
 
 export type ProductV2 = componentsv2["schemas"]["Product"];
-export type SearchResultV2 = externalv2["responses/search_for_products.yaml"];
+export type SearchResultV2 = externalv2["schemas/product_tags.yaml"];
 
 // By default, use v2
 export type { ProductV2 as Product, SearchResultV2 as SearchResult };
@@ -182,10 +182,11 @@ class OpenFoodFacts {
 
 	async search(
 		fields?: string,
-		sortBy?: componentsv2["parameters"]["sort_by"]
+		sortBy?: componentsv2["parameters"]["sort_by"],
+		category?: string
 	): Promise<SearchResultV2 | undefined> {
 		const res = await this.rawv2.GET("/api/v2/search", {
-			params: { query: { fields, sort_by: sortBy } },
+			params: { query: { fields, sort_by: sortBy, category } },
 		});
 
 		return res.data;

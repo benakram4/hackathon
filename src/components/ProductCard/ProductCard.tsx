@@ -1,8 +1,10 @@
 import Image from "next/image";
 
+import { useAtom } from "jotai";
 import { Heart, Leaf, ShoppingCart, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { shoppingCartAtom } from "@/store";
 import type { WalmartItem } from "@/types/walmart";
 
 interface ProductCardProps {
@@ -10,6 +12,9 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+	const [shoppingCart, setShoppingCart] = useAtom(shoppingCartAtom);
+	const inCart = shoppingCart.some((item) => item.itemId === product.itemId);
+
 	const renderSustainabilityRating = (rating: number) => {
 		const fullLeaves = Math.floor(rating);
 		const hasHalfLeaf = rating % 1 >= 0.5;
@@ -64,6 +69,21 @@ export default function ProductCard({ product }: ProductCardProps) {
 
 	const isInStock = product.stock !== "Not available";
 
+	// update cart based on product availability in cart
+	const updateCart = () => {
+		if (inCart) {
+			// Remove product from cart
+			setShoppingCart((prevCart) =>
+				prevCart.filter((item) => item.itemId !== product.itemId)
+			);
+			console.log("Removed from cart");
+		} else {
+			// Add to cart
+			setShoppingCart((prevCart) => [...prevCart, product]);
+			console.log("adding to cart");
+		}
+	};
+
 	return (
 		<div className="group border-border bg-card hover:border-primary/20 relative flex flex-col overflow-hidden rounded-xl border transition-all duration-300 hover:shadow-lg">
 			{/* Wishlist Button */}
@@ -78,6 +98,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 						src={product.largeImage || "/placeholder.svg?height=200&width=200"}
 						alt={product.name}
 						fill
+						sizes="200px"
 						className="object-contain p-6"
 					/>
 				</div>
@@ -117,10 +138,13 @@ export default function ProductCard({ product }: ProductCardProps) {
 				</div>
 
 				<Button
-					className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
-					disabled={!isInStock}>
+					className="bg-primary text-primary-foreground hover:bg-primary/90 flex cursor-pointer items-center gap-2"
+					disabled={!isInStock}
+					onClick={updateCart}>
 					<ShoppingCart className="h-4 w-4" />
-					<span className="sm:block">{isInStock ? "Add" : "Sold Out"}</span>
+					<span className="sm:block">
+						{isInStock ? (inCart ? "Remove" : "Add to Cart") : "Sold Out"}
+					</span>
 				</Button>
 			</div>
 

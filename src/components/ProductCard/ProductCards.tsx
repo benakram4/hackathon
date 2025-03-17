@@ -17,6 +17,8 @@ export default function ProductCards() {
 			throw new Error("Failed to fetch items");
 		}
 		const data: WalmartItemsResponse = await response.json();
+
+		// console.log(`Fetched itemss: ${JSON.stringify(data)}`);
 		return data;
 	}
 
