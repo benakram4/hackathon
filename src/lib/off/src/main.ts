@@ -3,24 +3,24 @@ import createClient from "openapi-fetch";
 import { USER_AGENT } from "./consts";
 import { Robotoff } from "./robotoff";
 import {
-	components as componentsv2,
-	external as externalv2,
-	paths as pathsv2,
+	type components as componentsv2,
+	type external as externalv2,
+	type paths as pathsv2,
 } from "./schemas/server/v2";
 import { TAXONOMY_URL } from "./taxonomy/api";
 import {
-	Additive,
-	Allergen,
-	Brand,
-	Category,
-	Country,
-	Ingredient,
-	Label,
-	Language,
-	State,
-	Store,
-	TaxoNode,
-	Taxonomy,
+	type Additive,
+	type Allergen,
+	type Brand,
+	type Category,
+	type Country,
+	type Ingredient,
+	type Label,
+	type Language,
+	type State,
+	type Store,
+	type TaxoNode,
+	type Taxonomy,
 } from "./taxonomy/types";
 
 export type ProductV2 = componentsv2["schemas"]["Product"];
@@ -54,7 +54,7 @@ class OpenFoodFacts {
 	 */
 	constructor(
 		fetch: typeof global.fetch,
-		options: OpenFoodFactsOptions = { country: "world" }
+		options: OpenFoodFactsOptions = { country: "world" },
 	) {
 		this.baseUrl = `https://${options.country}.openfoodfacts.org`;
 		this.fetch = fetch;
@@ -72,11 +72,11 @@ class OpenFoodFacts {
 
 	private async getTaxoEntry<T extends TaxoNode>(
 		taxo: string,
-		entry: string
+		entry: string,
 	): Promise<T> {
 		const res = await fetch(
 			`${this.baseUrl}/api/v2/taxonomy?tagtype=${taxo}&tags=${entry}`,
-			{ headers: { "User-Agent": USER_AGENT } }
+			{ headers: { "User-Agent": USER_AGENT } },
 		);
 
 		return (await res.json()) as T;
@@ -144,7 +144,7 @@ class OpenFoodFacts {
 	async performOCR(
 		barcode: string,
 		photoId: string,
-		ocrEngine: "google_cloud_vision" = "google_cloud_vision"
+		ocrEngine: "google_cloud_vision" = "google_cloud_vision",
 	): Promise<{ status?: number } | undefined> {
 		const res = await this.rawv2.GET("/cgi/ingredients.pl", {
 			params: {
@@ -183,7 +183,7 @@ class OpenFoodFacts {
 	async search(
 		fields?: string,
 		sortBy?: componentsv2["parameters"]["sort_by"],
-		category?: string
+		category?: string,
 	): Promise<SearchResultV2 | undefined> {
 		const res = await this.rawv2.GET("/api/v2/search", {
 			params: { query: { fields, sort_by: sortBy, category } },

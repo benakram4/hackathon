@@ -19,17 +19,21 @@ const ProductShowcase = () => {
 
 	const handlePrev = () => {
 		setCurrentIndex((prev) =>
-			prev === 0 ? productAlternatives.length - 1 : prev - 1
+			prev === 0 ? productAlternatives.length - 1 : prev - 1,
 		);
 	};
 
 	const handleNext = () => {
 		setCurrentIndex((prev) =>
-			prev === productAlternatives.length - 1 ? 0 : prev + 1
+			prev === productAlternatives.length - 1 ? 0 : prev + 1,
 		);
 	};
 
 	const currentAlternative = productAlternatives[currentIndex];
+
+	if (!currentAlternative) {
+		return null;
+	}
 
 	return (
 		<section
@@ -89,7 +93,7 @@ const ProductShowcase = () => {
 										</span>
 										<span className="text-xs">
 											{
-												currentAlternative.regularProduct.sustainability
+												currentAlternative?.regularProduct.sustainability
 													.packaging
 											}
 										</span>
@@ -99,7 +103,7 @@ const ProductShowcase = () => {
 											Locally Sourced:
 										</span>
 										<span className="text-xs">
-											{currentAlternative.regularProduct.sustainability
+											{currentAlternative?.regularProduct.sustainability
 												.locallySourced
 												? "Yes"
 												: "No"}
@@ -109,10 +113,9 @@ const ProductShowcase = () => {
 							</div>
 						</div>
 						<div className="relative mb-6 aspect-[4/3] overflow-hidden rounded-lg">
-							{/* TODO change to next image when mock data changed */}
 							<img
-								src={currentAlternative.regularProduct.image}
-								alt={currentAlternative.regularProduct.name}
+								src={currentAlternative?.regularProduct.image}
+								alt={currentAlternative?.regularProduct.name}
 								className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
 							/>
 						</div>
@@ -173,7 +176,6 @@ const ProductShowcase = () => {
 						</div>
 						<div className="relative mb-6 aspect-[4/3] overflow-hidden rounded-lg">
 							<div className="from-primary/10 absolute inset-0 z-10 bg-gradient-to-tr to-transparent" />
-							{/* TODO change to next image when mock data changed */}
 							<img
 								src={currentAlternative.sustainableAlternative.image}
 								alt={currentAlternative.sustainableAlternative.name}
@@ -209,7 +211,7 @@ const ProductShowcase = () => {
 									"h-2.5 w-2.5 rounded-full transition-all",
 									idx === currentIndex
 										? "bg-primary w-6"
-										: "bg-primary/30 hover:bg-primary/50"
+										: "bg-primary/30 hover:bg-primary/50",
 								)}
 							/>
 						))}

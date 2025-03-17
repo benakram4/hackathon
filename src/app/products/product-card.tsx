@@ -74,7 +74,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 		if (inCart) {
 			// Remove product from cart
 			setShoppingCart((prevCart) =>
-				prevCart.filter((item) => item.itemId !== product.itemId)
+				prevCart.filter((item) => item.itemId !== product.itemId),
 			);
 			console.log("Removed from cart");
 		} else {

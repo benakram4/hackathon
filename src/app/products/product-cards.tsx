@@ -2,26 +2,12 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { WalmartItem, WalmartItemsResponse } from "@/types/walmart";
+import { getItems } from "@/lib/walmart/api";
+import { type WalmartItem, type WalmartItemsResponse } from "@/types/walmart";
 
-import ProductCard from "./ProductCard";
-
-const baseUrl = process.env.NEXT_PUBLIC_PROD_URL || "http://localhost:3000";
+import ProductCard from "./product-card";
 
 export default function ProductCards() {
-	async function getItems(): Promise<WalmartItemsResponse> {
-		const response = await fetch(`${baseUrl}/api/walmart/items`, {
-			method: "GET",
-		});
-		if (!response.ok) {
-			throw new Error("Failed to fetch items");
-		}
-		const data: WalmartItemsResponse = await response.json();
-
-		// console.log(`Fetched itemss: ${JSON.stringify(data)}`);
-		return data;
-	}
-
 	const { data, error, isLoading } = useQuery<WalmartItemsResponse>({
 		queryKey: ["items"],
 		queryFn: getItems,

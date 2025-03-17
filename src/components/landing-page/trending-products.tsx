@@ -1,13 +1,21 @@
 import { useRef } from "react";
 
-import { ChevronLeft, ChevronRight, Leaf, Star } from "lucide-react";
+import {
+	ChevronLeft,
+	ChevronRight,
+	Leaf,
+	ShoppingCart,
+	Star,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/cart-context";
 import { trendingProducts } from "@/data/products";
 
 const TrendingProducts = () => {
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
+	const { addToCart } = useCart();
 
 	const scroll = (direction: "left" | "right") => {
 		if (scrollContainerRef.current) {
@@ -18,6 +26,11 @@ const TrendingProducts = () => {
 					: current.offsetWidth / 1.5;
 			current.scrollBy({ left: scrollAmount, behavior: "smooth" });
 		}
+	};
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const handleAddToCart = (product: any) => {
+		addToCart(product);
 	};
 
 	return (
@@ -69,7 +82,6 @@ const TrendingProducts = () => {
 											Organic
 										</Badge>
 									)}
-									{/* TODO change to next image when mock data changed */}
 									<img
 										src={product.image}
 										alt={product.name}
@@ -101,7 +113,12 @@ const TrendingProducts = () => {
 										<span className="font-semibold">
 											${product.price.toFixed(2)}
 										</span>
-										<Button size="sm" variant="outline">
+										<Button
+											size="sm"
+											variant="outline"
+											onClick={() => handleAddToCart(product)}
+											className="flex items-center gap-1">
+											<ShoppingCart className="h-3.5 w-3.5" />
 											Add to Cart
 										</Button>
 									</div>

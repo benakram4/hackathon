@@ -2,8 +2,8 @@
 import createClient from "openapi-fetch";
 
 import { USER_AGENT } from "./consts";
-import { NutriPatrolError } from "./error";
-import { components, paths } from "./schemas/nutripatrol";
+import { type NutriPatrolError } from "./error";
+import { type components, type paths } from "./schemas/nutripatrol";
 
 export type Flag = components["schemas"]["FlagCreate"];
 export type Ticket = components["schemas"]["Ticket"];
@@ -50,7 +50,7 @@ export class NutriPatrol {
 	private async fetchApi<T>(
 		method: "GET" | "POST" | "PUT" | "DELETE",
 		path: string,
-		options: any = {}
+		options: any = {},
 	): Promise<T | NutriPatrolError> {
 		const methods = {
 			GET: this.raw.GET,
@@ -61,7 +61,7 @@ export class NutriPatrol {
 
 		try {
 			const fct = methods[method] as any;
-			const res = await fct(path as any, options as any);
+			const res = await fct(path as any, options);
 			let errorDetails: NutriPatrolError | undefined;
 
 			if (!res.response.ok) {
@@ -145,7 +145,7 @@ export class NutriPatrol {
 			`/api/v1/flags/{flag_id}`,
 			{
 				params: { path: { flag_id: flagId } },
-			}
+			},
 		);
 		if ("error" in data) {
 			return data;
@@ -188,7 +188,7 @@ export class NutriPatrol {
 	 *
 	 */
 	async getFlagsByTicketBatch(
-		ticketIds: number[]
+		ticketIds: number[],
 	): Promise<{ [ticketId: string]: Flag[] } | NutriPatrolError> {
 		const data = await this.fetchApi<FlagBatchResponse>(
 			"POST",
@@ -197,7 +197,7 @@ export class NutriPatrol {
 				body: {
 					ticket_ids: ticketIds,
 				},
-			}
+			},
 		);
 		if ("error" in data) {
 			return data;
@@ -227,7 +227,7 @@ export class NutriPatrol {
 		const data = await this.fetchApi<TicketsResponse>(
 			"GET",
 			`/api/v1/tickets`,
-			{ params: { query } }
+			{ params: { query } },
 		);
 		if ("error" in data) {
 			return data;
@@ -253,7 +253,7 @@ export class NutriPatrol {
 			`/api/v1/tickets/{ticket_id}`,
 			{
 				params: { path: { ticket_id: ticketId } },
-			}
+			},
 		);
 		if ("error" in data) {
 			return data;
@@ -274,7 +274,7 @@ export class NutriPatrol {
 	 *
 	 */
 	async createTicket(
-		ticketData: Omit<Ticket, "id">
+		ticketData: Omit<Ticket, "id">,
 	): Promise<Ticket | NutriPatrolError> {
 		const data = await this.fetchApi<Ticket>("POST", `/api/v1/tickets`, {
 			body: ticketData,
@@ -300,7 +300,7 @@ export class NutriPatrol {
 	 */
 	async updateTicketStatus(
 		ticketId: number,
-		status: "open" | "closed"
+		status: "open" | "closed",
 	): Promise<Ticket | NutriPatrolError> {
 		const data = await this.fetchApi<Ticket>(
 			"PUT",
@@ -310,7 +310,7 @@ export class NutriPatrol {
 					path: { ticket_id: ticketId },
 					query: { status },
 				},
-			}
+			},
 		);
 		if ("error" in data) {
 			return data;
@@ -331,7 +331,7 @@ export class NutriPatrol {
 	async getApiStatus(): Promise<{ status: string } | NutriPatrolError> {
 		const data = await this.fetchApi<{ status: string }>(
 			"GET",
-			`/api/v1/status`
+			`/api/v1/status`,
 		);
 		if ("error" in data) {
 			return data;

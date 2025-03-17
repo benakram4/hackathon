@@ -1,13 +1,16 @@
 {
 	"compilerOptions": {
-		"target": "ES2017",
+		"target": "ES2022",
 		"lib": ["dom", "dom.iterable", "esnext"],
 		"allowJs": true,
 		"skipLibCheck": true,
-		"strict": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+		"moduleDetection": "force",
+    "checkJs": true,
 		"noEmit": true,
 		"esModuleInterop": true,
-		"module": "esnext",
+		"module": "ESNext",
 		"moduleResolution": "bundler",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
@@ -22,6 +25,6 @@
 			"@/*": ["./src/*"]
 		}
 	},
-	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/api/walmart/categories/route.ts"],
+	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.mjs" , ".next/types/**/*.ts"],
 	"exclude": ["node_modules"]
 }
