@@ -2,6 +2,7 @@ import { includeIgnoreFile } from "@eslint/compat";
 import { FlatCompat } from "@eslint/eslintrc";
 import pluginQuery from "@tanstack/eslint-plugin-query";
 import { dirname, resolve } from "path";
+import tseslint from "typescript-eslint";
 import { fileURLToPath } from "url";
 
 /*
@@ -20,42 +21,39 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
 	...pluginQuery.configs["flat/recommended"],
+	...tseslint.configs.recommendedTypeChecked,
 	...compat.config({
+		parserOptions: {
+			projectService: true,
+			tsconfigRootDir: __dirname,
+		},
 		extends: [
 			"next/core-web-vitals",
 			"next/typescript",
 			"plugin:prettier/recommended",
+			"plugin:@typescript-eslint/recommended-type-checked",
 		],
-		plugins: ["prettier"],
+		plugins: ["prettier", "@typescript-eslint"],
 		rules: {
+			"@typescript-eslint/consistent-type-imports": [
+				"warn",
+				{
+					prefer: "type-imports",
+					fixStyle: "inline-type-imports",
+				},
+			],
+			"@typescript-eslint/no-unsafe-assignment": ["warn"],
+			"@typescript-eslint/no-unsafe-call": ["warn"],
+			"@typescript-eslint/no-unsafe-member-access": ["warn"],
+			"@typescript-eslint/no-unsafe-return": ["warn"],
+			"@typescript-eslint/no-unused-vars": ["warn"],
+			"@typescript-eslint/no-unsafe-argument": ["warn"],
 			"prefer-arrow-callback": ["error"],
 			"prefer-template": ["error"],
 			"prettier/prettier": [
 				"error",
 				{
-					semi: true,
-					singleQuote: false,
-					useTabs: true,
-					tabWidth: 2,
-					printWidth: 80,
-					trailingComma: "es5",
-					bracketSameLine: true,
-					endOfLine: "auto",
-					importOrder: [
-						"^(react|next?/?([a-zA-Z/]*))$",
-						"<THIRD_PARTY_MODULES>",
-						"^@/(.*)$",
-						"^[./]",
-					],
-					importOrderSeparation: true,
-					importOrderSortSpecifiers: true,
-					plugins: [
-						"@trivago/prettier-plugin-sort-imports",
-						"prettier-plugin-tailwindcss",
-					],
-				},
-				{
-					usePrettierrc: false,
+					usePrettierrc: true,
 				},
 			],
 		},

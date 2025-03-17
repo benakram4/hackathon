@@ -15,7 +15,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { useCart } from "@/contexts/cart-context";
-import { Product, productAlternatives } from "@/data/products";
+import { type Product, productAlternatives } from "@/data/products";
 
 interface SwapModalProps {
 	isOpen: boolean;
@@ -42,7 +42,7 @@ const SwapModal: React.FC<SwapModalProps> = ({
 		const alternativeData = productAlternatives.find(
 			(data) =>
 				data.sustainableAlternative.id === alternative.id ||
-				data.regularProduct.id === originalProduct.id
+				data.regularProduct.id === originalProduct.id,
 		);
 
 		return alternativeData;
@@ -133,7 +133,7 @@ const SwapModal: React.FC<SwapModalProps> = ({
 											<div className="text-xs">
 												{getPriceDifference(
 													originalProduct.price,
-													alternative.price
+													alternative.price,
 												)}
 											</div>
 										</div>

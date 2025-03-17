@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { ProductV2 } from "@/lib/off/src/main";
+import { type ProductV2 } from "@/lib/off/src/main";
 import { getOffClient } from "@/providers/get-off-client";
 
 // OpenFoodFacts query keys factory
@@ -20,7 +20,7 @@ export function useProductOFF(barcode: string) {
 			if (!product) {
 				throw new Error("Product not found");
 			}
-			return product as ProductV2;
+			return product;
 		},
 		staleTime: 5 * 60 * 1000, // 5 minutes
 	});

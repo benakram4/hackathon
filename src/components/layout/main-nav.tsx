@@ -327,7 +327,7 @@
 // ];
 import Link from "next/link";
 
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
@@ -368,6 +368,11 @@ const MainNav = () => {
 				</nav>
 
 				<div className="flex items-center gap-4">
+					<Link href="/account">
+						<Button variant="ghost" size="icon" className="relative">
+							<User />
+						</Button>
+					</Link>
 					<Link href="/cart" className="relative">
 						<Button variant="ghost" size="icon" className="relative">
 							<ShoppingCart className="h-5 w-5" />

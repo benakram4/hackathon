@@ -10,7 +10,8 @@
 	"github.copilot.editor.enableAutoCompletions": true,
 	"github.copilot.chat.reviewSelection.instructions": [
 		{
-			"text": "Aspire to use the following when:  react 19, react server component, nextjs 15, tailwind, shadcn, react query. "
+			"text": "Aspire to use the following when possible:  nextjs 15, react 19, react server component, tailwind, shadcn, react query, avoid context api prefer jotai or react query"
 		}
-	]
+	],
+	"cSpell.words": ["appwrite"]
 }

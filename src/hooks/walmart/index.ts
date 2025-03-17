@@ -1,6 +1,6 @@
-import { QueryClient, useQuery } from "@tanstack/react-query";
+import { type QueryClient, useQuery } from "@tanstack/react-query";
 
-import { WalmartCategory } from "@/types";
+import { type WalmartCategory } from "@/types";
 
 const baseUrl = process.env.NEXT_PUBLIC_PROD_URL || "http://localhost:3000";
 
@@ -22,8 +22,7 @@ export async function fetchWalmartCategories({
 	if (!response.ok) {
 		throw new Error("Failed to fetch categories");
 	}
-	const data = await response.json();
-	return data as WalmartCategory[];
+	return await response.json();
 }
 
 // Hook to fetch categories from Walmart API
@@ -40,6 +39,6 @@ export function useWalmartCategories() {
 export async function preFetchWalmartCategories(queryClient: QueryClient) {
 	return await queryClient.prefetchQuery({
 		queryKey: walmartKeys.categories(),
-		queryFn: async () => await fetchWalmartCategories,
+		queryFn: fetchWalmartCategories,
 	});
 }
