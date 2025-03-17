@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,15 +10,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { auth } from "@/lib/auth";
+import { createSession } from "@/lib/auth";
 
 import { LoginWithGoogle } from "../login-with-google";
 
 // TODO add validation with zod and hook form
-export async function LoginForm() {
-	const user = await auth.getUser();
-	//TODO this redirect should be to handle the middleware
-	if (user) redirect("/account");
+export function LoginForm() {
 	return (
 		<Card className="flex flex-col gap-6">
 			<CardHeader>
@@ -29,7 +25,7 @@ export async function LoginForm() {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<form action={auth.createSession}>
+				<form action={createSession}>
 					<div className="flex flex-col gap-6">
 						<div className="grid gap-2">
 							<Label htmlFor="email">Email</Label>

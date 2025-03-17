@@ -2,7 +2,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { auth } from "./lib/auth";
+import { getUser } from "@/lib/auth";
 
 const protectedRoutes = ["/products", "/account"];
 const publicRoutes = ["/login", "/signup", "/"];
@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.next();
 	}
 	const isProtectedRoute = protectedRoutes.includes(path);
-	const user = await auth.getUser();
+	const user = await getUser();
 
 	if (isProtectedRoute && !user) {
 		console.log("Not User found", user);

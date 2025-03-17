@@ -4,12 +4,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
-
 @layer utilities {
   .glass {
     @apply bg-white/80 backdrop-blur-md border border-white/30 shadow-sm;
   }
-  
+
   .text-balance {
     text-wrap: balance;
   }
@@ -22,7 +21,7 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -161,11 +160,9 @@
 		font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
 	}
 
-	
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold leading-tight tracking-tight;
   }
-
 
   h1 {
     @apply text-4xl md:text-5xl lg:text-6xl;
@@ -181,5 +178,14 @@
 
   p {
     @apply leading-relaxed;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
