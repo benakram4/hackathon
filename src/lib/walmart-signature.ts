@@ -14,7 +14,7 @@ interface WalmartHeaders {
  * @returns Array with parameter names string and canonicalized string
  */
 function canonicalize(
-	headers: Omit<WalmartHeaders, "WM_SEC.AUTH_SIGNATURE">
+	headers: Omit<WalmartHeaders, "WM_SEC.AUTH_SIGNATURE">,
 ): [string, string] {
 	const sortedKeys = Object.keys(headers).sort();
 
@@ -38,7 +38,7 @@ function canonicalize(
  */
 function generateSignature(
 	privateKeyPem: string,
-	stringToSign: string
+	stringToSign: string,
 ): string {
 	const sign = crypto.createSign("SHA256");
 	sign.update(stringToSign);
@@ -62,7 +62,7 @@ function generateSignature(
 export function generateWalmartHeaders(
 	consumerId: string,
 	privateKeyVersion: string,
-	privateKeyPem: string
+	privateKeyPem: string,
 ): WalmartHeaders {
 	const timestamp = Date.now().toString();
 

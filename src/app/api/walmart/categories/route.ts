@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { generateWalmartHeaders } from "@/lib/walmart-signature";
 import { RELEVANT_CATEGORIES } from "@/lib/walmart/constants";
-import { WalmartCategoriesResponse } from "@/types";
+import { type WalmartCategoriesResponse } from "@/types";
 
 export async function GET() {
 	try {
@@ -13,7 +13,7 @@ export async function GET() {
 		const headers = generateWalmartHeaders(
 			consumerId,
 			privateKeyVersion,
-			privateKeyPem
+			privateKeyPem,
 		);
 
 		const response = await fetch(
@@ -21,12 +21,12 @@ export async function GET() {
 			{
 				method: "GET",
 				headers,
-			}
+			},
 		);
 
 		const data: WalmartCategoriesResponse = await response.json();
 		const filteredCategories = data.categories.filter(
-			(category) => category && Object.hasOwn(RELEVANT_CATEGORIES, category.id)
+			(category) => category && Object.hasOwn(RELEVANT_CATEGORIES, category.id),
 		);
 		return NextResponse.json(filteredCategories);
 	} catch (error) {

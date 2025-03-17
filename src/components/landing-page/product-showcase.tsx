@@ -19,13 +19,13 @@ const ProductShowcase = () => {
 
 	const handlePrev = () => {
 		setCurrentIndex((prev) =>
-			prev === 0 ? productAlternatives.length - 1 : prev - 1
+			prev === 0 ? productAlternatives.length - 1 : prev - 1,
 		);
 	};
 
 	const handleNext = () => {
 		setCurrentIndex((prev) =>
-			prev === productAlternatives.length - 1 ? 0 : prev + 1
+			prev === productAlternatives.length - 1 ? 0 : prev + 1,
 		);
 	};
 
@@ -207,7 +207,7 @@ const ProductShowcase = () => {
 									"h-2.5 w-2.5 rounded-full transition-all",
 									idx === currentIndex
 										? "bg-primary w-6"
-										: "bg-primary/30 hover:bg-primary/50"
+										: "bg-primary/30 hover:bg-primary/50",
 								)}
 							/>
 						))}

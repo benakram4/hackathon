@@ -18,8 +18,9 @@ export async function Layout() {
 			if (!response.ok) {
 				throw new Error("Failed to fetch categories");
 			}
-			const data = await response.json();
-			return data;
+
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+			return await response.json();
 		},
 	});
 	// Hydrate the pre-fetched state to the client

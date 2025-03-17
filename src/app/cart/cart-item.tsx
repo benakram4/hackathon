@@ -6,7 +6,10 @@ import { Minus, Plus, RefreshCw, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CartItem as CartItemType, useCart } from "@/contexts/cart-context";
+import {
+	type CartItem as CartItemType,
+	useCart,
+} from "@/contexts/cart-context";
 
 import SwapModal from "./swap-modal";
 

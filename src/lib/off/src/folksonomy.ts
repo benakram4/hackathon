@@ -1,9 +1,9 @@
 import createClient from "openapi-fetch";
 
 import { USER_AGENT } from "./consts";
-import { ApiError } from "./error";
+import { type ApiError } from "./error";
 import { formBody as formBodySerializer } from "./formbody";
-import { components, paths } from "./schemas/folksonomy";
+import { type components, type paths } from "./schemas/folksonomy";
 
 export type FolksonomyTag = components["schemas"]["ProductTag"];
 export type FolksonomyKey = {
@@ -37,7 +37,7 @@ export class Folksonomy {
 	private validateAuthToken(message?: string) {
 		if (!this.authToken) {
 			throw new Error(
-				message || "Auth token is required to perform this action"
+				message || "Auth token is required to perform this action",
 			);
 		}
 	}
@@ -129,7 +129,7 @@ export class Folksonomy {
 	 */
 	async login(
 		username: string,
-		password: string
+		password: string,
 	): Promise<
 		| { token: { access_token: string; token_type: string } }
 		| { error: ApiError }

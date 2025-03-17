@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { generateWalmartHeaders } from "@/lib/walmart-signature";
-import { WalmartItemsResponse } from "@/types";
+import { type WalmartItemsResponse } from "@/types";
 
 export async function GET() {
 	try {
@@ -12,7 +12,7 @@ export async function GET() {
 		const headers = generateWalmartHeaders(
 			consumerId,
 			privateKeyVersion,
-			privateKeyPem
+			privateKeyPem,
 		);
 
 		const response = await fetch(
@@ -20,7 +20,7 @@ export async function GET() {
 			{
 				method: "GET",
 				headers,
-			}
+			},
 		);
 
 		const data: WalmartItemsResponse = await response.json();

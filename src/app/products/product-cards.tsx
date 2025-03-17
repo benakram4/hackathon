@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { getItems } from "@/lib/walmart/api";
-import { WalmartItem, WalmartItemsResponse } from "@/types/walmart";
+import { type WalmartItem, type WalmartItemsResponse } from "@/types/walmart";
 
 import ProductCard from "./product-card";
 

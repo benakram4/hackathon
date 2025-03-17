@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 import { toast } from "sonner";
 
-import { Product, productAlternatives } from "@/data/products";
+import { type Product, productAlternatives } from "@/data/products";
 
 export type SwapPreference = "sustainable" | "healthier" | "local" | "balanced";
 
@@ -70,7 +70,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 	const addToCart = (product: Product, quantity = 1) => {
 		setItems((prevItems) => {
 			const existingItemIndex = prevItems.findIndex(
-				(item) => item.product.id === product.id
+				(item) => item.product.id === product.id,
 			);
 
 			if (existingItemIndex >= 0) {
@@ -90,7 +90,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 			const itemToRemove = prevItems.find(
 				(item) =>
 					item.product.id === productId ||
-					(item.swappedFor && item.swappedFor.id === productId)
+					(item.swappedFor && item.swappedFor.id === productId),
 			);
 
 			if (itemToRemove) {
@@ -100,7 +100,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 			return prevItems.filter(
 				(item) =>
 					item.product.id !== productId &&
-					(!item.swappedFor || item.swappedFor.id !== productId)
+					(!item.swappedFor || item.swappedFor.id !== productId),
 			);
 		});
 	};
@@ -116,14 +116,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 				item.product.id === productId ||
 				(item.swappedFor && item.swappedFor.id === productId)
 					? { ...item, quantity }
-					: item
-			)
+					: item,
+			),
 		);
 	};
 
 	const findSwapAlternatives = (productId: number): Product[] => {
 		const directAlternative = productAlternatives.find(
-			(alt) => alt.regularProduct.id === productId
+			(alt) => alt.regularProduct.id === productId,
 		);
 
 		if (directAlternative) {
@@ -169,7 +169,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 			prevItems.map((item) => {
 				if (item.product.id === originalProductId) {
 					toast.success(
-						`Swapped ${item.product.name} for ${alternativeProduct.name}`
+						`Swapped ${item.product.name} for ${alternativeProduct.name}`,
 					);
 					return {
 						...item,
@@ -178,7 +178,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 					};
 				}
 				return item;
-			})
+			}),
 		);
 	};
 
@@ -194,7 +194,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 					};
 				}
 				return item;
-			})
+			}),
 		);
 	};
 
@@ -208,7 +208,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 				const alternative = productAlternatives.find(
 					(alt) =>
 						alt.regularProduct.id === item.product.id ||
-						alt.sustainableAlternative.id === item.swappedFor?.id
+						alt.sustainableAlternative.id === item.swappedFor?.id,
 				);
 
 				if (alternative) {
