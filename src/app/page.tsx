@@ -10,9 +10,5 @@ export default function Home() {
 	// 	error: offProductError,
 	// } = useProductOFF("5000112546415");
 
-	return (
-		<div className="min-h-screen">
-			<LandingPage />
-		</div>
-	);
+	return <LandingPage />;
 }

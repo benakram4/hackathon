@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { auth } from "@/lib/auth";
+import { withGoogle } from "@/lib/auth";
 
 export function LoginWithGoogle() {
 	return (
-		<form action={auth.withGoogle}>
+		<form action={withGoogle}>
 			<Button variant="outline" className="mt-2 w-full" type="submit">
 				Login with Google
 			</Button>
