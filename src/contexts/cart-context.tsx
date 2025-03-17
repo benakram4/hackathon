@@ -75,7 +75,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
 			if (existingItemIndex >= 0) {
 				const updatedItems = [...prevItems];
-				updatedItems[existingItemIndex].quantity += quantity;
+				updatedItems[existingItemIndex]!.quantity += quantity;
 				toast.success(`Updated quantity for ${product.name}`);
 				return updatedItems;
 			} else {
