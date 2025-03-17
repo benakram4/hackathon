@@ -22,7 +22,7 @@ function canonicalize(
 	let canonicalizedStr = "";
 
 	for (const key of sortedKeys) {
-		const val = headers[key as keyof typeof headers];
+		const val = headers[key as keyof typeof headers] as string;
 		parameterNames += `${key.trim()};`;
 		canonicalizedStr += `${val.toString().trim()}\n`;
 	}
