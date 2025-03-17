@@ -30,7 +30,7 @@ export const auth = {
 		if (!email || !password) {
 			throw new Error("Missing required fields");
 		}
-		const { account } = createAdminClient();
+		const { account } = await createAdminClient();
 
 		const session = await account.createEmailPasswordSession(
 			email as string,
@@ -51,7 +51,7 @@ export const auth = {
 	withGoogle: async () => {
 		"use server";
 
-		const { account } = createAdminClient();
+		const { account } = await createAdminClient();
 		const origin = (await headers()).get("origin");
 		const redirectUrl = await account.createOAuth2Token(
 			OAuthProvider.Google,
@@ -71,7 +71,7 @@ export const auth = {
 			throw new Error("Missing required fields");
 		}
 
-		const { account } = createAdminClient();
+		const { account } = await createAdminClient();
 
 		await account.create(ID.unique(), email, password);
 		const session = await account.createEmailPasswordSession(email, password);

@@ -28,7 +28,8 @@ export async function createSessionClient(sessionValue?: string) {
 	};
 }
 
-export function createAdminClient() {
+// eslint-disable-next-line @typescript-eslint/require-await
+export async function createAdminClient() {
 	const client = new Client()
 		.setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT as string)
 		.setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT as string)

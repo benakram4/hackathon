@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 		);
 	}
 
-	const { account } = createAdminClient();
+	const { account } = await createAdminClient();
 	const session = await account.createSession(userId, secret);
 
 	(await cookies()).set("session", session.secret, {
