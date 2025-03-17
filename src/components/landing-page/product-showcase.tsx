@@ -31,6 +31,10 @@ const ProductShowcase = () => {
 
 	const currentAlternative = productAlternatives[currentIndex];
 
+	if (!currentAlternative) {
+		return null;
+	}
+
 	return (
 		<section
 			id="alternatives"
@@ -89,7 +93,7 @@ const ProductShowcase = () => {
 										</span>
 										<span className="text-xs">
 											{
-												currentAlternative.regularProduct.sustainability
+												currentAlternative?.regularProduct.sustainability
 													.packaging
 											}
 										</span>
@@ -99,7 +103,7 @@ const ProductShowcase = () => {
 											Locally Sourced:
 										</span>
 										<span className="text-xs">
-											{currentAlternative.regularProduct.sustainability
+											{currentAlternative?.regularProduct.sustainability
 												.locallySourced
 												? "Yes"
 												: "No"}
@@ -110,8 +114,8 @@ const ProductShowcase = () => {
 						</div>
 						<div className="relative mb-6 aspect-[4/3] overflow-hidden rounded-lg">
 							<img
-								src={currentAlternative.regularProduct.image}
-								alt={currentAlternative.regularProduct.name}
+								src={currentAlternative?.regularProduct.image}
+								alt={currentAlternative?.regularProduct.name}
 								className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
 							/>
 						</div>
