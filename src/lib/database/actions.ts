@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 
 import { Query } from "node-appwrite";
+import { v4 as uuidv4 } from "uuid";
 
 import {
 	type OrderSwapHistory,
@@ -26,15 +27,7 @@ export async function getUserAddress(
 			[Query.equal("userId", userId)],
 		);
 
-		if (!userAddress.length) {
-			return null;
-		}
-		if (!userAddress[0]) {
-			// TODO: This needs to be handled differently
-			// this scenario means the user hans't set up their address yet
-			// for now, we'll just return null
-			return null;
-		}
+		if (!userAddress.length || !userAddress[0]) return null;
 
 		const address: UserAddress = {
 			$id: userAddress[0].$id,
@@ -64,7 +57,26 @@ export async function updateUserAddress(
 
 	try {
 		const { databases } = await createSessionClient(sessionCookie?.value);
+		console.log("address", address);
 		const { $id, ...addressData } = address;
+		// if the address does not contain $id, it means it's a new address
+		if (!$id) {
+			const documentId = uuidv4().replace(/-/g, "").slice(0, 20);
+			const { $id: createdDocumentId } = await databases.createDocument(
+				process.env.APPWRITE_DATABASE_ID as string,
+				process.env.APPWRITE_USER_ADDRESS_COLLECTION_ID as string,
+				documentId,
+				{ ...addressData },
+			);
+
+			const newAddress: UserAddress = {
+				$id: createdDocumentId,
+				...addressData,
+			};
+
+			return newAddress;
+		}
+
 		const { $id: documentId } = await databases.updateDocument(
 			process.env.APPWRITE_DATABASE_ID as string,
 			process.env.APPWRITE_USER_ADDRESS_COLLECTION_ID as string,

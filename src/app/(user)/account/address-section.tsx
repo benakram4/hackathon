@@ -41,7 +41,20 @@ const AddressSection = ({ user }: AddressSectionProps) => {
 
 	const handleEdit = () => {
 		setEditAddress(
-			userAddress ? { ...userAddress, $id: userAddress.$id || "" } : null,
+			userAddress
+				? { ...userAddress, $id: userAddress.$id || "" }
+				: {
+						$id: "",
+						userId: user.$id,
+						type: "",
+						number: 0,
+						line1: "",
+						line2: "",
+						city: "",
+						province: "",
+						postalCode: "",
+						country: "",
+					},
 		);
 		setIsEditing(true);
 	};
@@ -53,8 +66,12 @@ const AddressSection = ({ user }: AddressSectionProps) => {
 
 	const handleSave = async () => {
 		if (!editAddress) return;
-		await updateUserAddress(user.$id, editAddress);
-		setUserAddress(editAddress);
+		const sanitizedAddress = {
+			...editAddress,
+			number: parseInt(editAddress.number as unknown as string, 0),
+		};
+		await updateUserAddress(user.$id, sanitizedAddress);
+		setUserAddress(sanitizedAddress);
 		setIsEditing(false);
 	};
 
@@ -63,11 +80,10 @@ const AddressSection = ({ user }: AddressSectionProps) => {
 		setEditAddress((prev) => (prev ? { ...prev, [name]: value } : null));
 	};
 
-	console.log("userAddress", userAddress);
 	return (
 		<div className="space-y-6">
 			<div className="flex items-center justify-between">
-				<h2 className="text-2xl font-bold">Shipping Address</h2>
+				<h2 className="text-2xl font-bold">Address</h2>
 				{isEditing ? (
 					<div className="flex gap-2">
 						<Button variant="destructive" onClick={handleCancel}>
@@ -85,7 +101,7 @@ const AddressSection = ({ user }: AddressSectionProps) => {
 				) : (
 					<Button onClick={handleEdit}>
 						<Pencil className="mr-2 h-4 w-4" />
-						Edit Address
+						{userAddress ? "Edit Address" : "Add Address"}
 					</Button>
 				)}
 			</div>
@@ -101,17 +117,23 @@ const AddressSection = ({ user }: AddressSectionProps) => {
 					</CardHeader>
 					<CardContent>
 						{!isEditing ? (
-							<div className="space-y-1 text-sm">
-								<p>
-									{userAddress?.number} {userAddress?.line1}
-								</p>
-								{userAddress?.line2 && <p>{userAddress?.line2}</p>}
-								<p>
-									{userAddress?.city}, {userAddress?.province}{" "}
-									{userAddress?.postalCode}
-								</p>
-								<p>{userAddress?.country}</p>
-							</div>
+							userAddress ? (
+								<div className="space-y-1 text-sm">
+									<p>{userAddress.number}</p>
+									<p>{userAddress.line1}</p>
+									{userAddress.line2 && <p>{userAddress.line2}</p>}
+									<p>
+										{userAddress.city}, {userAddress.province}{" "}
+										{userAddress.postalCode}
+									</p>
+									<p>{userAddress.country}</p>
+								</div>
+							) : (
+								<div className="text-muted-foreground py-4 text-center">
+									<p>You haven&apos;t provided your address yet.</p>
+									<p>Click &quot;Add Address&quot; to add your address.</p>
+								</div>
+							)
 						) : (
 							<form className="space-y-4">
 								<div className="space-y-2">
@@ -119,11 +141,11 @@ const AddressSection = ({ user }: AddressSectionProps) => {
 									<Select
 										name="type"
 										value={editAddress?.type || ""}
-										onValueChange={(value: string) =>
+										onValueChange={(value) => {
 											setEditAddress((prev) =>
 												prev ? { ...prev, type: value } : null,
-											)
-										}>
+											);
+										}}>
 										<SelectTrigger id="type">
 											<SelectValue placeholder="Select address type" />
 										</SelectTrigger>
@@ -139,7 +161,7 @@ const AddressSection = ({ user }: AddressSectionProps) => {
 									<Input
 										id="number"
 										name="number"
-										value={editAddress?.number || ""}
+										value={editAddress?.number || 0}
 										onChange={handleChange}
 									/>
 								</div>
