@@ -4,7 +4,7 @@ import { generateWalmartHeaders } from "@/lib/walmart-signature";
 
 export async function GET(
 	request: Request,
-	{ params }: { params: Promise<{ id: string }> }
+	{ params }: { params: Promise<{ id: string }> },
 ) {
 	try {
 		const { id } = await params;
@@ -12,7 +12,7 @@ export async function GET(
 		if (!id) {
 			return NextResponse.json(
 				{ error: "Item ID is required" },
-				{ status: 400 }
+				{ status: 400 },
 			);
 		}
 
@@ -23,7 +23,7 @@ export async function GET(
 		const headers = generateWalmartHeaders(
 			consumerId,
 			privateKeyVersion,
-			privateKeyPem
+			privateKeyPem,
 		);
 
 		const response = await fetch(
@@ -31,13 +31,13 @@ export async function GET(
 			{
 				method: "GET",
 				headers,
-			}
+			},
 		);
 
 		if (!response.ok) {
 			return NextResponse.json(
 				{ error: `Failed to fetch item with ID: ${id}` },
-				{ status: response.status }
+				{ status: response.status },
 			);
 		}
 
@@ -47,7 +47,7 @@ export async function GET(
 		console.error(`Error fetching item:`, error);
 		return NextResponse.json(
 			{ error: "Internal server error" },
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }
