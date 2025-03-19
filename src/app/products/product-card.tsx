@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import { Heart, Leaf, ShoppingCart, Star } from "lucide-react";
 
@@ -66,75 +67,67 @@ export default function ProductCard({ product }: ProductCardProps) {
 
 	return (
 		<div className="group border-border bg-card hover:border-primary/20 relative flex flex-col overflow-hidden rounded-xl border transition-all duration-300 hover:shadow-lg">
-			{/* Wishlist Button */}
-			<button className="bg-background/80 hover:bg-primary/10 hover:text-primary absolute top-4 right-4 z-10 rounded-full p-2 backdrop-blur-sm transition-all">
-				<Heart className="h-5 w-5" />
-			</button>
+			<Link href={`/product/${product.itemId}`}>
+				{/* Wishlist Button */}
+				<button className="bg-background/80 hover:bg-primary/10 hover:text-primary absolute top-4 right-4 z-10 rounded-full p-2 backdrop-blur-sm transition-all">
+					<Heart className="h-5 w-5" />
+				</button>
 
-			{/* Image Section */}
-			<div className="bg-muted/50 relative h-64 w-full overflow-hidden">
-				<div className="absolute inset-0 flex items-center justify-center transition-transform duration-500 group-hover:scale-105">
-					<Image
-						src={product.largeImage || "/placeholder.svg?height=200&width=200"}
-						alt={product.name}
-						fill
-						className="object-contain p-6"
-					/>
-				</div>
-				<div className="bg-card/80 absolute right-3 bottom-3 rounded-full px-3 py-1 shadow-md backdrop-blur-sm">
-					{renderSustainabilityRating(1.5)}
-				</div>
-			</div>
-
-			{/* Content Section */}
-			<div className="flex-grow p-5">
-				<div className="mb-3 flex items-center justify-between">
-					<p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-						{product.brandName || "Brand"}
-					</p>
-					<div className="flex items-center gap-1">
-						<Star className="fill-primary text-primary h-4 w-4" />
-						<span className="text-sm font-medium">4.8</span>
+				{/* Image Section */}
+				<div className="bg-muted/50 relative h-64 w-full overflow-hidden">
+					<div className="absolute inset-0 flex items-center justify-center transition-transform duration-500 group-hover:scale-105">
+						<Image
+							src={
+								product.largeImage || "/placeholder.svg?height=200&width=200"
+							}
+							alt={product.name}
+							fill
+							className="object-contain p-6"
+						/>
+					</div>
+					<div className="bg-card/80 absolute right-3 bottom-3 rounded-full px-3 py-1 shadow-md backdrop-blur-sm">
+						{renderSustainabilityRating(1.5)}
 					</div>
 				</div>
 
-				<h3 className="text-foreground mb-2 line-clamp-1 text-lg font-bold">
-					{product.name}
-				</h3>
-				<p className="text-muted-foreground mb-4 line-clamp-3 text-sm">
-					{product.shortDescription}
-				</p>
-			</div>
+				{/* Content Section */}
+				<div className="flex-grow p-5">
+					<div className="mb-3 flex items-center justify-between">
+						<p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+							{product.brandName || "Brand"}
+						</p>
+						<div className="flex items-center gap-1">
+							<Star className="fill-primary text-primary h-4 w-4" />
+							<span className="text-sm font-medium">4.8</span>
+						</div>
+					</div>
 
-			{/* Price & Actions */}
-			<div className="border-border flex items-center justify-between border-t p-5">
-				<div className="space-y-1">
-					<span className="text-foreground text-xl font-bold">
-						{product.salePrice
-							? `$${product.salePrice}`
-							: "Price not available"}
-					</span>
+					<h3 className="text-foreground mb-2 line-clamp-1 text-lg font-bold">
+						{product.name}
+					</h3>
+					<p className="text-muted-foreground mb-4 line-clamp-3 text-sm">
+						{product.shortDescription}
+					</p>
 				</div>
 
-				<Button
-					className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
-					disabled={!isInStock}>
-					<ShoppingCart className="h-4 w-4" />
-					<span className="sm:block">{isInStock ? "Add" : "Sold Out"}</span>
-				</Button>
-			</div>
+				{/* Price & Actions */}
+				<div className="border-border flex items-center justify-between border-t p-5">
+					<div className="space-y-1">
+						<span className="text-foreground text-xl font-bold">
+							{product.salePrice
+								? `$${product.salePrice}`
+								: "Price not available"}
+						</span>
+					</div>
 
-			{/* Stock Status */}
-			<div className="border-border bg-muted/30 flex w-full items-center justify-center border-t p-3">
-				<div className="flex items-center gap-2">
-					<div
-						className={`h-3 w-3 rounded-full ${isInStock ? "bg-primary" : "bg-destructive"}`}
-						title={isInStock ? "In Stock" : "Out of Stock"}></div>
-					<span className="text-foreground text-sm font-medium">
-						{isInStock ? "In Stock" : "Out of Stock"}
-					</span>
+					<Button
+						className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
+						disabled={!isInStock}>
+						<ShoppingCart className="h-4 w-4" />
+						<span className="sm:block">{isInStock ? "Add" : "Sold Out"}</span>
+					</Button>
 				</div>
-			</div>
+			</Link>
 		</div>
 	);
 }

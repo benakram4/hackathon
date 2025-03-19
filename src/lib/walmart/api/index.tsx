@@ -7,6 +7,17 @@ export async function getItems() {
 	if (!response.ok) {
 		throw new Error("Failed to fetch items");
 	}
-	const data = await response.json();
-	return data;
+	return await response.json();
+}
+
+export async function getItem(itemId: string) {
+	const response = await fetch(`${baseUrl}/api/walmart/item/${itemId}`, {
+		method: "GET",
+	});
+
+	if (!response.ok) {
+		throw new Error(`Failed to fetch item with ID: ${itemId}`);
+	}
+
+	return await response.json();
 }
