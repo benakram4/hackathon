@@ -8,7 +8,7 @@ import {
 	type OrderSwapHistory,
 	type UserImpact,
 	type UserOrders,
-} from "@/types/user";
+} from "@/types/database";
 
 import { createSessionClient } from "../server/appwrite";
 
@@ -69,7 +69,8 @@ export async function getOrderHistory(
 
 		// TODO: investigate why swap.orderId is undefined.
 		// it's not even coming from the database even though appwrite console shows it.
-		// most likely has something to do with the fact that the type of this specific attribute is a "relationship" in the appwrite console and not a "string"
+		// most likely has something to do with the fact that the type of this specific attribute is a "relationship" in the appwrite database and not a "string"
+		// orders correctly have the swap history when the data comes back but the orderId is undefined
 		const orderHistory: UserOrders[] = user_orders.map((order) => ({
 			$id: order.$id,
 			$createdAt: order.$createdAt,

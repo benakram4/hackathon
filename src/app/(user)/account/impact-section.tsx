@@ -29,7 +29,7 @@ import {
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { type User } from "@/lib/auth";
 import { getImpactData } from "@/lib/database/actions";
-import { type UserImpact } from "@/types/user";
+import { type UserImpact } from "@/types/database";
 
 // Mock data for charts
 const monthlyImpactData = [
