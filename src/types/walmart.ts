@@ -9,6 +9,18 @@ export type WalmartCategoriesResponse = {
 	categories: WalmartCategory[];
 };
 
+export type SearchResponse = {
+	query: string;
+	sort: string;
+	responseGroup: string;
+	totalResults: number;
+	start: number;
+	numItems: number;
+	items: WalmartItem[];
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	facets: any[]; // TODO Replace 'any' with a more specific type if possible
+};
+
 export type WalmartItem = {
 	itemId: number;
 	parentItemId: number;
