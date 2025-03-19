@@ -12,7 +12,13 @@ import { AccountSidebar } from "./account-sidebar";
 interface AccountProps {
 	user: User;
 }
-type AccountSection = "profile" | "address" | "orders" | "impact" | "rewards";
+type AccountSection =
+	| "profile"
+	| "address"
+	| "orders"
+	| "impact"
+	| "rewards"
+	| "preferences";
 
 const Account = ({ user }: AccountProps) => {
 	const [activeSection, setActiveSection] = useState<AccountSection>("profile");

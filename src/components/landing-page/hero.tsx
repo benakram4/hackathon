@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { ArrowRight, Leaf, ShieldCheck, Zap } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -36,10 +38,12 @@ const Hero = () => {
 					<div
 						className="animate-slide-up mb-16 flex flex-col items-center justify-center gap-4 sm:flex-row"
 						style={{ animationDelay: "200ms" }}>
-						<Button size="lg" className="group w-full sm:w-auto">
-							Get Started
-							<ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-						</Button>
+						<Link href="/products">
+							<Button size="lg" className="group w-full sm:w-auto">
+								Shop Now
+								<ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+							</Button>
+						</Link>
 						<Button variant="outline" size="lg" className="w-full sm:w-auto">
 							Learn More
 						</Button>
