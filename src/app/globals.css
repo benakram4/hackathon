@@ -4,36 +4,35 @@
 
 @custom-variant dark (&:is(.dark *));
 
-
 @layer utilities {
-  .glass {
-    @apply bg-white/80 backdrop-blur-md border border-white/30 shadow-sm;
-  }
-  
-  .text-balance {
-    text-wrap: balance;
-  }
+	.glass {
+		@apply border border-white/30 bg-white/80 shadow-sm backdrop-blur-md;
+	}
 
-  .section-padding {
-    @apply py-16 md:py-24;
-  }
+	.text-balance {
+		text-wrap: balance;
+	}
 
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
+	.section-padding {
+		@apply py-16 md:py-24;
+	}
 
-  .fade-mask-r {
-    mask-image: linear-gradient(to right, black 80%, transparent 100%);
-  }
+	.hide-scrollbar {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
 
-  .fade-mask-b {
-    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-  }
+	.hide-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
+
+	.fade-mask-r {
+		mask-image: linear-gradient(to right, black 80%, transparent 100%);
+	}
+
+	.fade-mask-b {
+		mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+	}
 }
 
 @theme inline {
@@ -75,6 +74,8 @@
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
+	--header-height: 4rem;
+	--footer-height: 20rem;
 }
 
 :root {
@@ -153,33 +154,45 @@
 		@apply border-border outline-ring/50 selection:bg-primary/10 selection:text-primary;
 	}
 
-  html {
-    @apply scroll-smooth;
-  }
+	html {
+		@apply scroll-smooth;
+	}
 	body {
 		@apply bg-background text-foreground antialiased;
 		font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
 	}
 
-	
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold leading-tight tracking-tight;
-  }
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		@apply leading-tight font-semibold tracking-tight;
+	}
 
+	h1 {
+		@apply text-4xl md:text-5xl lg:text-6xl;
+	}
 
-  h1 {
-    @apply text-4xl md:text-5xl lg:text-6xl;
-  }
+	h2 {
+		@apply text-3xl md:text-4xl;
+	}
 
-  h2 {
-    @apply text-3xl md:text-4xl;
-  }
+	h3 {
+		@apply text-2xl md:text-3xl;
+	}
 
-  h3 {
-    @apply text-2xl md:text-3xl;
-  }
+	p {
+		@apply leading-relaxed;
+	}
+}
 
-  p {
-    @apply leading-relaxed;
-  }
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
 }

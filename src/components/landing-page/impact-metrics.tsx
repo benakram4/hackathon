@@ -88,7 +88,7 @@ const ImpactMetrics = () => {
 				prevStats.map((stat) => ({
 					...stat,
 					value: Math.round((stat.end / steps) * currentStep),
-				}))
+				})),
 			);
 
 			if (currentStep >= steps) {
@@ -131,12 +131,12 @@ const ImpactMetrics = () => {
 									className={cn(
 										"mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full",
 										"bg-opacity-10 text-white",
-										stat.color
+										stat.color,
 									)}>
 									<Icon
 										className={cn(
 											"h-8 w-8",
-											stat.color.replace("bg-", "text-")
+											stat.color.replace("bg-", "text-"),
 										)}
 									/>
 								</div>
@@ -152,7 +152,7 @@ const ImpactMetrics = () => {
 									className={cn(
 										"absolute bottom-0 left-0 h-1 w-full transition-all duration-700 group-hover:h-full",
 										"rounded-b-2xl opacity-0 group-hover:opacity-5",
-										stat.color
+										stat.color,
 									)}
 								/>
 							</div>

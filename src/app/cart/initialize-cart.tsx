@@ -17,7 +17,7 @@ export const InitializeCart = () => {
 					(product) =>
 						product.sustainability.carbonFootprint === "high" ||
 						(!product.sustainability.locallySourced &&
-							!product.sustainability.organicCertified)
+							!product.sustainability.organicCertified),
 				)
 				.slice(0, 4);
 
@@ -33,7 +33,7 @@ export const InitializeCart = () => {
 				itemsToSwap.forEach((product) => {
 					// Find an alternative for this product
 					const alternative = productAlternatives.find(
-						(alt) => alt.regularProduct.id === product.id
+						(alt) => alt.regularProduct.id === product.id,
 					);
 
 					if (alternative) {

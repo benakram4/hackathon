@@ -20,7 +20,10 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { CartItem as CartItemType, useCart } from "@/contexts/cart-context";
+import {
+	type CartItem as CartItemType,
+	useCart,
+} from "@/contexts/cart-context";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 

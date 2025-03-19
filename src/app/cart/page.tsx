@@ -15,7 +15,7 @@ import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SwapPreference, useCart } from "@/contexts/cart-context";
+import { type SwapPreference, useCart } from "@/contexts/cart-context";
 import { products } from "@/data/products";
 
 import CartItem from "./cart-item";
@@ -45,7 +45,7 @@ const swapOptions: {
 // Items that are frequently bought together
 const frequentlyBoughtTogether = products
 	.filter(
-		(product) => product.isPopular && product.sustainability.locallySourced
+		(product) => product.isPopular && product.sustainability.locallySourced,
 	)
 	.slice(0, 4);
 
@@ -94,16 +94,17 @@ const Cart: React.FC = () => {
 		itemsToSwap.forEach((item) => {
 			const alternatives = findSwapAlternatives(item.product.id);
 
-			if (alternatives.length > 0) {
+			const alternative = alternatives[0];
+			if (alternatives.length > 0 && alternative) {
 				// Use the first alternative found
-				swapItem(item.product.id, alternatives[0]);
+				swapItem(item.product.id, alternative);
 				swappedCount++;
 			}
 		});
 
 		if (swappedCount > 0) {
 			toast.success(
-				`Swapped ${swappedCount} items based on your ${swapPreference} preference`
+				`Swapped ${swappedCount} items based on your ${swapPreference} preference`,
 			);
 		} else {
 			toast.info("No suitable alternatives found for your items");
@@ -120,22 +121,14 @@ const Cart: React.FC = () => {
 	};
 
 	if (items.length === 0) {
-		return (
-			// <div className="flex min-h-screen flex-col">
-			// 	<Navbar />
-			// 	<main className="container mx-auto flex-1 px-4 py-8">
-			<EmptyCart />
-			// 	</main>
-			// 	<Footer />
-			// </div>
-		);
+		return <EmptyCart />;
 	}
 
 	return (
 		<div className="flex min-h-screen flex-col">
 			{/* <Navbar /> */}
 
-			<main className="container mx-auto flex-1 px-4 py-8">
+			<div className="container mx-auto flex-1 px-4 py-8">
 				<div className="mb-8">
 					<h1 className="mb-2 text-3xl font-bold">Your Cart</h1>
 					<p className="text-muted-foreground">
@@ -266,9 +259,7 @@ const Cart: React.FC = () => {
 						))}
 					</div>
 				</div>
-			</main>
-
-			{/* <Footer /> */}
+			</div>
 		</div>
 	);
 };

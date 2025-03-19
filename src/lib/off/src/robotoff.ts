@@ -1,7 +1,7 @@
 import createClient from "openapi-fetch";
 
 import { USER_AGENT } from "./consts";
-import { paths } from "./schemas/robotoff";
+import { type paths } from "./schemas/robotoff";
 
 type InsightQuery = paths["/insights"]["get"]["parameters"]["query"];
 type InsightResponse =
