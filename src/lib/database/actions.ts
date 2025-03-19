@@ -6,11 +6,83 @@ import { Query } from "node-appwrite";
 
 import {
 	type OrderSwapHistory,
+	type UserAddress,
 	type UserImpact,
 	type UserOrders,
 } from "@/types/database";
 
 import { createSessionClient } from "../server/appwrite";
+
+export async function getUserAddress(
+	userId: string,
+): Promise<UserAddress | null> {
+	const sessionCookie = (await cookies()).get("session");
+
+	try {
+		const { databases } = await createSessionClient(sessionCookie?.value);
+		const { documents: userAddress } = await databases.listDocuments(
+			process.env.APPWRITE_DATABASE_ID as string,
+			process.env.APPWRITE_USER_ADDRESS_COLLECTION_ID as string,
+			[Query.equal("userId", userId)],
+		);
+
+		if (!userAddress.length) {
+			return null;
+		}
+		if (!userAddress[0]) {
+			// TODO: This needs to be handled differently
+			// this scenario means the user hans't set up their address yet
+			// for now, we'll just return null
+			return null;
+		}
+
+		const address: UserAddress = {
+			$id: userAddress[0].$id,
+			userId: userAddress[0].userId as string,
+			type: userAddress[0].type as string,
+			number: userAddress[0].number as number,
+			line1: userAddress[0].line1 as string,
+			line2: userAddress[0].line2 as string,
+			city: userAddress[0].city as string,
+			province: userAddress[0].province as string,
+			postalCode: userAddress[0].postalCode as string,
+			country: userAddress[0].country as string,
+		};
+
+		return address;
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
+}
+
+export async function updateUserAddress(
+	userId: string,
+	address: UserAddress,
+): Promise<UserAddress | null> {
+	const sessionCookie = (await cookies()).get("session");
+
+	try {
+		const { databases } = await createSessionClient(sessionCookie?.value);
+		const { $id, ...addressData } = address;
+		const { $id: documentId } = await databases.updateDocument(
+			process.env.APPWRITE_DATABASE_ID as string,
+			process.env.APPWRITE_USER_ADDRESS_COLLECTION_ID as string,
+			$id,
+			addressData,
+		);
+
+		const updatedAddress: UserAddress = {
+			$id: documentId,
+			...addressData,
+		};
+
+		return updatedAddress;
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
+}
 
 export async function getImpactData(
 	userId: string,
@@ -19,25 +91,25 @@ export async function getImpactData(
 
 	try {
 		const { databases } = await createSessionClient(sessionCookie?.value);
-		const { documents: user_impact } = await databases.listDocuments(
+		const { documents: userImpact } = await databases.listDocuments(
 			process.env.APPWRITE_DATABASE_ID as string,
 			process.env.APPWRITE_USER_IMPACT_COLLECTION_ID as string,
 			[Query.equal("user_id", userId)],
 		);
 		// this where everything needs to be calculated
-		if (!user_impact.length) {
+		if (!userImpact.length) {
 			return null;
 		}
-		if (!user_impact[0]) {
+		if (!userImpact[0]) {
 			throw new Error("User impact data is undefined");
 		}
 
 		const impactData: UserImpact = {
-			$id: user_impact[0].$id,
-			userId: user_impact[0].user_id as string,
-			co2: user_impact[0].co2 as number,
-			waste: user_impact[0].waste as number,
-			water: user_impact[0].water as number,
+			$id: userImpact[0].$id,
+			userId: userImpact[0].user_id as string,
+			co2: userImpact[0].co2 as number,
+			waste: userImpact[0].waste as number,
+			water: userImpact[0].water as number,
 		};
 
 		return impactData;
@@ -54,16 +126,16 @@ export async function getOrderHistory(
 
 	try {
 		const { databases } = await createSessionClient(sessionCookie?.value);
-		const { documents: user_orders } = await databases.listDocuments(
+		const { documents: userOrders } = await databases.listDocuments(
 			process.env.APPWRITE_DATABASE_ID as string,
 			process.env.APPWRITE_USER_ORDERS_COLLECTION_ID as string,
 			[Query.equal("userId", userId)],
 		);
 
-		if (!user_orders.length) {
+		if (!userOrders.length) {
 			return null;
 		}
-		if (!user_orders[0]) {
+		if (!userOrders[0]) {
 			throw new Error("User order data is undefined");
 		}
 
@@ -71,7 +143,7 @@ export async function getOrderHistory(
 		// it's not even coming from the database even though appwrite console shows it.
 		// most likely has something to do with the fact that the type of this specific attribute is a "relationship" in the appwrite database and not a "string"
 		// orders correctly have the swap history when the data comes back but the orderId is undefined
-		const orderHistory: UserOrders[] = user_orders.map((order) => ({
+		const orderHistory: UserOrders[] = userOrders.map((order) => ({
 			$id: order.$id,
 			$createdAt: order.$createdAt,
 			userId: order.userId as string,

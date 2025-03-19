@@ -29,3 +29,16 @@ export type UserOrders = {
 	waste: number;
 	water: number;
 };
+
+export type UserAddress = {
+	$id: string;
+	userId: string;
+	type: string;
+	number: number;
+	line1: string;
+	line2: string;
+	city: string;
+	province: string;
+	postalCode: string;
+	country: string;
+};
