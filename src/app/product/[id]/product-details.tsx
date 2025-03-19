@@ -6,13 +6,14 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { getItem } from "@/lib/walmart/api";
+import { type WalmartItem } from "@/types";
 
 export default function ProductDetails({ itemId }: { itemId: string }) {
 	const {
 		data: item,
 		isLoading,
 		error,
-	} = useQuery({
+	} = useQuery<WalmartItem>({
 		queryKey: ["item", itemId],
 		queryFn: () => getItem(itemId),
 	});
