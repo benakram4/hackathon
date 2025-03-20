@@ -32,8 +32,8 @@ export default function SwapPage() {
 			try {
 				const upc = walmartItem.items[0]?.upc;
 				if (!upc) return;
-
-				const response = await fetch(`/api/off/item?barcode=${upc}`);
+				const mayoOffUPC = "048001213487";
+				const response = await fetch(`/api/off/item?barcode=${mayoOffUPC}`);
 				const data = await response.json();
 				console.log("offWalmartItem", data);
 				setOffWalmartItem(data);
@@ -63,12 +63,39 @@ export default function SwapPage() {
 					<p>OFF product_name_en:{offWalmartItem.product_name_en}</p>
 					<p>OFF categories{offWalmartItem.categories}</p>
 					<p>OFF compared_to_category{offWalmartItem.compared_to_category}</p>
+					<p>OFF ecoscore_grade:{offWalmartItem.ecoscore_grade}</p>
+					<p>OFF ecoscore_score:{offWalmartItem.ecoscore_score}</p>
+					<p>
+						OFF ecoscore_score co2_total:
+						{offWalmartItem.ecoscore_data.agribalyse.co2_total}
+					</p>
+
 					<p>OFF nova_group:{offWalmartItem.nova_group}</p>
+					<p>
+						OFF nova_groups_markers:
+						{offWalmartItem.nova_groups_markers[offWalmartItem.nova_group]}
+					</p>
+
 					<p>
 						OFF nutrient_levels:{JSON.stringify(offWalmartItem.nutrient_levels)}
 					</p>
 					<p>OFF nutriscore grade:{offWalmartItem?.nutriscore_grade}</p>
 					<p>OFF nutriscore score:{offWalmartItem?.nutriscore_score}</p>
+					<p>OFF image:{offWalmartItem?.selected_images.front.display.en}</p>
+					<img
+						src={offWalmartItem?.image_front_url ?? ""}
+						alt="Image"
+						width={500}
+						height={200}
+						className="rounded-lg"
+					/>
+					<p>OFF packaging: {offWalmartItem?.packaging}</p>
+					<p>
+						OFF threatened_species:{" "}
+						{JSON.stringify(
+							offWalmartItem?.ecoscore_data.adjustments.threatened_species,
+						)}
+					</p>
 				</div>
 			)}
 			{/* Add your swap items here */}
