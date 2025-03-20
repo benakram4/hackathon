@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import OpenFoodFacts from "@/lib/off/src/main";
 import { type SearchResponse } from "@/types";
 
 export default function SwapPage() {
@@ -44,6 +45,23 @@ export default function SwapPage() {
 
 		void fetchOffWalmartItems();
 	}, [walmartItem]);
+
+	useEffect(() => {
+		if (!offWalmartItem?.categories) return;
+		const fetchOffSwapItems = async () => {
+			const off = new OpenFoodFacts(fetch, { country: "ca" });
+			try {
+				const product = await off.search("", "nutriscore_score", {
+					categories: "Mayonnaises",
+				});
+				console.log(`fetchOffSwapItems: ${JSON.stringify(product)}`);
+				setOffSwapItems(product);
+			} catch (error) {
+				console.error("Error fetching Open Food Facts items:", error);
+			}
+		};
+		void fetchOffSwapItems();
+	}, [offWalmartItem?.categories]);
 
 	return (
 		<div className="container flex flex-col items-center justify-center gap-4 py-6">
