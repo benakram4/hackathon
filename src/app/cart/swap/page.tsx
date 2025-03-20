@@ -113,18 +113,43 @@ export default function SwapPage() {
 				</div>
 			)}
 			{offSwapItems && (
-				<div className="flex flex-col gap-2 border-2 p-4">
+				<div>
 					<p>OFF product_name_en:{offSwapItems.product_name_en}</p>
 					<p>OFF categories{offSwapItems.categories}</p>
+					<p>OFF compared_to_category{offSwapItems.compared_to_category}</p>
+					<p>OFF ecoscore_grade:{offSwapItems.ecoscore_grade}</p>
+					<p>OFF ecoscore_score:{offSwapItems.ecoscore_score}</p>
 					<p>
-						OFF compared_to_category: {offSwapItems?.categories_hierarchy![0]}
+						OFF ecoscore_score co2_total:
+						{offSwapItems?.ecoscore_data?.agribalyse?.co2_total}
 					</p>
+
 					<p>OFF nova_group:{offSwapItems.nova_group}</p>
+					<p>
+						OFF nova_groups_markers:
+						{/* {offSwapItems?.nova_groups_markers?.[offSwapItems?.nova_group] ?? "N/A"} */}
+					</p>
+
 					<p>
 						OFF nutrient_levels:{JSON.stringify(offSwapItems.nutrient_levels)}
 					</p>
 					<p>OFF nutriscore grade:{offSwapItems?.nutriscore_grade}</p>
 					<p>OFF nutriscore score:{offSwapItems?.nutriscore_score}</p>
+					<p>OFF image:{offSwapItems?.selected_images?.front?.display?.en}</p>
+					<img
+						src={offSwapItems?.image_front_url ?? ""}
+						alt="Image"
+						width={500}
+						height={200}
+						className="rounded-lg"
+					/>
+					{/* // <p>OFF packaging: {offSwapItems?.packaging}</p> */}
+					<p>
+						OFF threatened_species:{" "}
+						{JSON.stringify(
+							offSwapItems?.ecoscore_data?.adjustments?.threatened_species,
+						)}
+					</p>
 				</div>
 			)}
 			{/* Add your swap items here */}
