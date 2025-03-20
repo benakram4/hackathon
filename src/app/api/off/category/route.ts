@@ -18,16 +18,13 @@ export async function GET() {
 	//     return NextResponse.json({ error: 'Product not found' }, { status: 404 });
 	// }
 
-	// const product = await off.search('categories_tag: en:cocoa-and-hazelnuts-spreads');
+	// cocoa-and-hazelnuts-spreads
 
-	const products = await fetch(
-		"https://world.openfoodfacts.org/api/v2/search?categories_tags_en=cocoa-and-hazelnuts-spreads",
-		{
-			method: "GET",
-		}
-	);
+	const product = await off.search("", "product_name", {
+		categories_tags: "en:cocoa-and-hazelnuts-spreads",
+	});
 
-	console.log(`Fetched item: ${JSON.stringify(products)}`);
+	console.log(`Fetched item: ${JSON.stringify(product?.products?.length)}`);
 
-	return NextResponse.json(products);
+	return NextResponse.json(product);
 }
