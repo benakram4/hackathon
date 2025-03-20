@@ -21,6 +21,7 @@ import { products } from "@/data/products";
 import CartItem from "./cart-item";
 import CartSummary from "./cart-summary";
 import EmptyCart from "./empty-cart";
+import SwapPage from "./swap/page";
 import SwappedItem from "./swapped-item";
 
 const swapOptions: {
@@ -178,6 +179,9 @@ const Cart: React.FC = () => {
 						)}
 					</div>
 				</div>
+
+				{/* Swap Page */}
+				<SwapPage />
 
 				{/* Main cart layout with fixed column widths */}
 				<div className="grid grid-cols-12 gap-8">
