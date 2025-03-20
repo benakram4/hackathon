@@ -2,19 +2,28 @@
 
 import { useEffect, useState } from "react";
 
+import { Button } from "@/components/ui/button";
+import { getSpecificCategory } from "@/lib/off-logic";
+import { type ProductV2 as offItem } from "@/lib/off/src/main";
 import { type SearchResponse } from "@/types";
 
 export default function SwapPage() {
 	const [walmartItem, setWalmartItem] = useState<SearchResponse | undefined>(
 		undefined,
 	);
-	const [offWalmartItem, setOffWalmartItem] = useState(undefined);
-	const [offSwapItems, setOffSwapItems] = useState([]);
+	const [offWalmartItem, setOffWalmartItem] = useState<offItem | undefined>(
+		undefined,
+	);
+	const [offSwapItems, setOffSwapItems] = useState<offItem | undefined>(
+		undefined,
+	);
 
 	useEffect(() => {
 		const fetchWalmartItems = async () => {
 			try {
-				const response = await fetch("/api/walmart/search?query=coca cola");
+				const response = await fetch(
+					"/api/walmart/search?query='NUTELLA® Hazelnut Spread'",
+				);
 				const data = (await response.json()) as SearchResponse;
 				setWalmartItem(data);
 			} catch (error) {
@@ -25,25 +34,62 @@ export default function SwapPage() {
 		void fetchWalmartItems();
 	}, []);
 
+	const fetchOffWalmartItems = async (upc: string) => {
+		try {
+			const response = await fetch(`/api/off/item?barcode=${upc}`);
+			const data = await response.json();
+			console.log("offWalmartItem", data);
+			setOffWalmartItem(data);
+		} catch (error) {
+			console.error("Error fetching Open Food Facts items:", error);
+		}
+	};
+
 	useEffect(() => {
-		if (!walmartItem?.items?.length) return;
+		if (!offWalmartItem) return;
 
-		const fetchOffWalmartItems = async () => {
+		const fetchOffSwapItems = async () => {
 			try {
-				const upc = walmartItem.items[0]?.upc;
-				if (!upc) return;
+				// we need categorical hierarchy for getting similar and specific products
+				if (!offWalmartItem.categories_hierarchy) {
+					alert("No categories_hierarchy found");
+				}
+				const specificCategory = getSpecificCategory(
+					offWalmartItem.categories_hierarchy!,
+				);
 
-				const response = await fetch(`/api/off/item?barcode=${upc}`);
+				console.log("specificCategory", specificCategory);
+
+				const response = await fetch(
+					`/api/off/category?category=${specificCategory}`,
+				);
+
+				if (response.status === 404) {
+					alert("No similar product found");
+					return;
+				}
+
 				const data = await response.json();
-				console.log("offWalmartItem", data);
-				setOffWalmartItem(data);
+
+				setOffSwapItems(data);
 			} catch (error) {
 				console.error("Error fetching Open Food Facts items:", error);
 			}
 		};
 
-		void fetchOffWalmartItems();
-	}, [walmartItem]);
+		void fetchOffSwapItems();
+	}, [offWalmartItem]);
+
+	const swapItems = () => {
+		console.log("Swap button clicked");
+
+		if (!walmartItem?.items[0]) {
+			alert("No items found in Walmart");
+			return;
+		}
+
+		void fetchOffWalmartItems(walmartItem?.items[0]?.upc);
+	};
 
 	return (
 		<div className="container flex flex-col items-center justify-center gap-4 py-6">
@@ -53,22 +99,32 @@ export default function SwapPage() {
 			</p>
 			{/* Add your swap functionality here */}
 			{walmartItem && (
-				<div>
-					<p>Walmart product_name_en: {walmartItem.items[0]?.name}</p>
-					<p>Walmart UPC:{walmartItem.items[0]?.upc}</p>
+				<div className="flex flex-col gap-2 border-2 p-4">
+					<p>
+						<span className="font-bold">Walmart product_name_en:</span>
+						{walmartItem.items[0]?.name}
+					</p>
+					<p>
+						<span className="font-bold">Walmart UPC:</span>
+						{walmartItem.items[0]?.upc}
+					</p>
+
+					<Button onClick={swapItems}>Swap</Button>
 				</div>
 			)}
-			{offWalmartItem && (
-				<div>
-					<p>OFF product_name_en:{offWalmartItem.product_name_en}</p>
-					<p>OFF categories{offWalmartItem.categories}</p>
-					<p>OFF compared_to_category{offWalmartItem.compared_to_category}</p>
-					<p>OFF nova_group:{offWalmartItem.nova_group}</p>
+			{offSwapItems && (
+				<div className="flex flex-col gap-2 border-2 p-4">
+					<p>OFF product_name_en:{offSwapItems.product_name_en}</p>
+					<p>OFF categories{offSwapItems.categories}</p>
 					<p>
-						OFF nutrient_levels:{JSON.stringify(offWalmartItem.nutrient_levels)}
+						OFF compared_to_category: {offSwapItems?.categories_hierarchy![0]}
 					</p>
-					<p>OFF nutriscore grade:{offWalmartItem?.nutriscore_grade}</p>
-					<p>OFF nutriscore score:{offWalmartItem?.nutriscore_score}</p>
+					<p>OFF nova_group:{offSwapItems.nova_group}</p>
+					<p>
+						OFF nutrient_levels:{JSON.stringify(offSwapItems.nutrient_levels)}
+					</p>
+					<p>OFF nutriscore grade:{offSwapItems?.nutriscore_grade}</p>
+					<p>OFF nutriscore score:{offSwapItems?.nutriscore_score}</p>
 				</div>
 			)}
 			{/* Add your swap items here */}

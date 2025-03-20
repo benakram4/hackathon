@@ -1,5 +1,5 @@
 import { atom } from "jotai";
 
-import { WalmartItem } from "./types";
+import { type WalmartItem } from "./types";
 
 export const shoppingCartAtom = atom<WalmartItem[]>([]);
