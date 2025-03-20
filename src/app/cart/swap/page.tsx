@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { getSpecificCategory } from "@/lib/off-logic";
-import OpenFoodFacts from "@/lib/off/src/main";
-import { type ProductV2 as offItem } from "@/lib/off/src/main";
+import OpenFoodFacts, { type ProductV2 as offItem } from "@/lib/off/src/main";
 import { type SearchResponse } from "@/types";
 
 export default function SwapPage() {
@@ -154,13 +153,15 @@ export default function SwapPage() {
 					<p>OFF nutriscore grade:{offSwapItems?.nutriscore_grade}</p>
 					<p>OFF nutriscore score:{offSwapItems?.nutriscore_score}</p>
 					<p>OFF image:{offSwapItems?.selected_images?.front?.display?.en}</p>
-					<img
-						src={offSwapItems?.image_front_url ?? ""}
-						alt="Image"
-						width={500}
-						height={200}
-						className="rounded-lg"
-					/>
+					{offSwapItems?.image_front_url && (
+						<img
+							src={offSwapItems?.image_front_url}
+							alt="Image"
+							width={500}
+							height={200}
+							className="rounded-lg"
+						/>
+					)}
 					{/* // <p>OFF packaging: {offSwapItems?.packaging}</p> */}
 					<p>
 						OFF threatened_species:{" "}
