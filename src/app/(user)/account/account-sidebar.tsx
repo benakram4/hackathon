@@ -1,4 +1,11 @@
-import { Award, BarChart, MapPin, Package, UserIcon } from "lucide-react";
+import {
+	Award,
+	BarChart,
+	MapPin,
+	Package,
+	Settings,
+	UserIcon,
+} from "lucide-react";
 
 import {
 	Sidebar,
@@ -11,7 +18,13 @@ import {
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-type AccountSection = "profile" | "address" | "orders" | "impact" | "rewards";
+type AccountSection =
+	| "profile"
+	| "address"
+	| "orders"
+	| "impact"
+	| "rewards"
+	| "preferences";
 
 type AccountSidebarProps = {
 	activeSection: AccountSection;
@@ -41,6 +54,16 @@ export function AccountSidebar({
 									tooltip="Profile">
 									<UserIcon />
 									<span>Profile</span>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									onClick={() => setActiveSection("preferences")}
+									isActive={activeSection === "preferences"}
+									tooltip="Preferences">
+									<Settings />
+									<span>Preferences</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
 
