@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { generateWalmartHeaders } from "@/lib/walmart-signature";
+import { getWalmartApiHeaders } from "@/lib/walmart-signature";
+import { type WalmartItem } from "@/types";
 
 export async function GET(
 	request: Request,
@@ -16,15 +17,7 @@ export async function GET(
 			);
 		}
 
-		const consumerId = process.env.WALMART_CONSUMER_ID || "";
-		const privateKeyVersion = process.env.WALMART_KEY_VERSION || "";
-		const privateKeyPem = process.env.WALMART_PRIVATE_KEY || "";
-
-		const headers = generateWalmartHeaders(
-			consumerId,
-			privateKeyVersion,
-			privateKeyPem,
-		);
+		const headers = getWalmartApiHeaders();
 
 		const response = await fetch(
 			`https://developer.api.walmart.com/api-proxy/service/affil/product/v2/items/${id}`,
@@ -41,13 +34,10 @@ export async function GET(
 			);
 		}
 
-		const data = await response.json();
+		const data = (await response.json()) as WalmartItem;
 		return NextResponse.json(data);
 	} catch (error) {
 		console.error(`Error fetching item:`, error);
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error }, { status: 500 });
 	}
 }

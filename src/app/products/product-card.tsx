@@ -80,7 +80,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 							src={
 								product.largeImage || "/placeholder.svg?height=200&width=200"
 							}
-							alt={product.name}
+							alt={product.name ?? "Product Image"}
 							fill
 							className="object-contain p-6"
 						/>
@@ -119,7 +119,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 								: "Price not available"}
 						</span>
 					</div>
-
+					{/* TODO consider enabling out of stock as we don't really care about it  */}
 					<Button
 						className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
 						disabled={!isInStock}>

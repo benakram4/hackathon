@@ -4,7 +4,7 @@ import {
 	dehydrate,
 } from "@tanstack/react-query";
 
-import { getItem } from "@/lib/walmart/api";
+import { getWalmartItem } from "@/lib/walmart/api";
 
 import ProductDetails from "./product-details";
 
@@ -18,7 +18,7 @@ export default async function ProductPage({
 
 	await queryClient.prefetchQuery({
 		queryKey: ["item", id],
-		queryFn: () => getItem(id),
+		queryFn: () => getWalmartItem(id),
 	});
 
 	return (

@@ -83,3 +83,15 @@ export function generateWalmartHeaders(
 		"WM_SEC.AUTH_SIGNATURE": signature,
 	};
 }
+
+/**
+ * Gets Walmart API headers using environment variables
+ * @returns Headers for Walmart API authentication
+ */
+export function getWalmartApiHeaders(): WalmartHeaders {
+	const consumerId = process.env.WALMART_CONSUMER_ID || "";
+	const privateKeyVersion = process.env.WALMART_KEY_VERSION || "";
+	const privateKeyPem = process.env.WALMART_PRIVATE_KEY || "";
+
+	return generateWalmartHeaders(consumerId, privateKeyVersion, privateKeyPem);
+}
