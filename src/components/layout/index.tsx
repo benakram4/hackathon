@@ -10,6 +10,7 @@ const baseUrl = process.env.NEXT_PUBLIC_PROD_URL || "http://localhost:3000";
 
 export async function Layout({ children }: { children: React.ReactNode }) {
 	const queryClient = getQueryClient();
+	// TODO We can use the constant i made with the a static data od the categories we need
 	await queryClient.prefetchQuery({
 		queryKey: walmartKeys.categories(),
 		queryFn: async () => {

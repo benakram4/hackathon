@@ -1,32 +1,49 @@
 import { NextResponse } from "next/server";
 
-import { generateWalmartHeaders } from "@/lib/walmart-signature";
-import { type WalmartItemsResponse } from "@/types";
+import { getWalmartApiHeaders } from "@/lib/walmart-signature";
+import { RELEVANT_FOOD_SUBCATEGORIES } from "@/lib/walmart/constants";
+import { type WalmartItem, type WalmartItemsResponse } from "@/types";
 
-export async function GET() {
+// Helper function to fetch items for a single category
+async function fetchItemsForCategory(
+	category: string,
+): Promise<WalmartItemsResponse> {
+	const headers = getWalmartApiHeaders();
+
+	const response = await fetch(
+		`https://developer.api.walmart.com/api-proxy/service/affil/product/v2/paginated/items?category=${category}&count=400&soldByWmt=true`,
+		{
+			method: "GET",
+			headers,
+		},
+	);
+
+	if (!response.ok) {
+		throw new Error(
+			`Walmart API responded with status: ${response.status} for category: ${category}`,
+		);
+	}
+
+	return response.json() as Promise<WalmartItemsResponse>;
+}
+
+export async function GET(): Promise<
+	NextResponse<WalmartItem[] | { error: unknown }>
+> {
 	try {
-		const consumerId = process.env.WALMART_CONSUMER_ID || "";
-		const privateKeyVersion = process.env.WALMART_KEY_VERSION || "";
-		const privateKeyPem = process.env.WALMART_PRIVATE_KEY || "";
+		// Get all category IDs
+		const categoryIds = Object.keys(RELEVANT_FOOD_SUBCATEGORIES);
 
-		const headers = generateWalmartHeaders(
-			consumerId,
-			privateKeyVersion,
-			privateKeyPem,
+		// Fetch items for all categories concurrently
+		const categoryResults = await Promise.all(
+			categoryIds.map((categoryId) => fetchItemsForCategory(categoryId)),
 		);
 
-		const response = await fetch(
-			"https://developer.api.walmart.com/api-proxy/service/affil/product/v2/paginated/items?category=976759&soldByWmt=true",
-			{
-				method: "GET",
-				headers,
-			},
-		);
-
-		const data: WalmartItemsResponse = await response.json();
-		return NextResponse.json(data);
+		// Extract and flatten all items from each category
+		const allItems = categoryResults.flatMap((result) => result.items || []);
+		return NextResponse.json(allItems);
 	} catch (error) {
 		console.error("Error fetching items:", error);
-		return NextResponse.json({ error: error }, { status: 500 });
+		return NextResponse.json({ error }, { status: 500 });
 	}
 }
