@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -8,10 +10,58 @@ import type { WalmartItem } from "@/types/walmart";
 
 interface ProductCardProps {
 	product: WalmartItem;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	knowledgePanelData?: any; // Add knowledge panel data prop
+	isLoadingKnowledgePanel?: boolean;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
-	const renderSustainabilityRating = (rating: number) => {
+export default function ProductCard({
+	product,
+	knowledgePanelData,
+	isLoadingKnowledgePanel = false,
+}: ProductCardProps) {
+	// Use sustainability data from knowledge panel if available
+	// Default to a placeholder value if not available
+	const getSustainabilityRating = () => {
+		if (isLoadingKnowledgePanel) {
+			return 0; // Show empty leaves while loading
+		}
+
+		// First check for data from the parent component
+		// Check if environment_card and environmental_score exist and extract the grade
+		if (
+			knowledgePanelData?.product?.knowledge_panels?.environment_card
+				?.elements &&
+			knowledgePanelData?.product?.knowledge_panels?.environmental_score
+				?.title_element?.grade
+		) {
+			const grade =
+				knowledgePanelData.product.knowledge_panels.environmental_score
+					.title_element.grade;
+
+			// Convert Eco-Score grade to a numerical rating (A=5, B=4, C=3, D=2, E=1)
+			switch (grade) {
+				case "a":
+					return 5;
+				case "b":
+					return 4;
+				case "c":
+					return 3;
+				case "d":
+					return 2;
+				case "e":
+					return 1;
+				default:
+					return 0; // Unknown or no Eco-Score
+			}
+		}
+
+		return 0;
+	};
+
+	const renderSustainabilityRating = (
+		rating: number = getSustainabilityRating(),
+	) => {
 		const fullLeaves = Math.floor(rating);
 		const hasHalfLeaf = rating % 1 >= 0.5;
 
@@ -82,11 +132,14 @@ export default function ProductCard({ product }: ProductCardProps) {
 							}
 							alt={product.name ?? "Product Image"}
 							fill
-							className="object-contain p-6"
+							style={{
+								objectFit: "contain",
+							}}
+							className="p-6"
 						/>
 					</div>
 					<div className="bg-card/80 absolute right-3 bottom-3 rounded-full px-3 py-1 shadow-md backdrop-blur-sm">
-						{renderSustainabilityRating(1.5)}
+						{renderSustainabilityRating()}
 					</div>
 				</div>
 
