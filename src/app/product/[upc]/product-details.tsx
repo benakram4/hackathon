@@ -4,35 +4,39 @@ import Image from "next/image";
 
 import { useQuery } from "@tanstack/react-query";
 
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getWalmartItem } from "@/lib/walmart/api";
 import { type WalmartItem } from "@/types";
 
-export default function ProductDetails({ itemId }: { itemId: string }) {
-	const {
-		data: item,
-		isLoading,
-		error,
-	} = useQuery<WalmartItem>({
-		queryKey: ["item", itemId],
-		queryFn: () => getWalmartItem(itemId),
+export default function ProductDetails({ upc }: { upc: string }) {
+	const { data, isLoading, error } = useQuery<{ items: WalmartItem[] }>({
+		queryKey: ["item", upc],
+		queryFn: () => getWalmartItem(upc),
 	});
 
 	if (isLoading) {
 		return <ProductDetailsSkeleton />;
 	}
 
-	if (error || !item) {
+	if (
+		error ||
+		!data ||
+		!data.items ||
+		data.items.length === 0 ||
+		data.items[0] === null
+	) {
 		return (
 			<div className="p-8 text-center">Failed to load product details</div>
 		);
 	}
-
+	// Extract the first item from the items array
+	const item = data.items[0];
 	return (
 		<div className="container mx-auto p-6">
 			<div className="grid gap-8 md:grid-cols-2">
-				<div className="relative aspect-square overflow-hidden rounded-lg">
-					{item.largeImage && (
+				<div className="relative aspect-square rounded-lg">
+					{item?.largeImage && (
 						<Image
 							src={item.largeImage}
 							alt={item.name}
@@ -44,20 +48,20 @@ export default function ProductDetails({ itemId }: { itemId: string }) {
 					)}
 				</div>
 				<div className="flex flex-col space-y-4">
-					<h1 className="text-3xl font-bold">{item.name}</h1>
+					<h1 className="text-3xl font-bold">{item?.name}</h1>
 					<div className="flex items-baseline gap-2">
-						<span className="text-2xl font-bold">${item.salePrice}</span>
-						{item.msrp > item.salePrice && (
+						<span className="text-2xl font-bold">${item?.salePrice}</span>
+						{(item?.msrp ?? 0) > (item?.salePrice ?? 0) && (
 							<span className="text-lg text-gray-500 line-through">
-								${item.msrp}
+								${item?.msrp ?? 0}
 							</span>
 						)}
 					</div>
 					<div>
 						<h2 className="text-lg font-semibold">Brand</h2>
-						<p>{item.brandName}</p>
+						<p>{item?.brandName}</p>
 					</div>
-					{item.shortDescription && (
+					{item?.shortDescription && (
 						<div>
 							<h2 className="text-lg font-semibold">Description</h2>
 							<p>{item.shortDescription}</p>
@@ -67,27 +71,27 @@ export default function ProductDetails({ itemId }: { itemId: string }) {
 						<h2 className="text-lg font-semibold">Details</h2>
 						<ul className="space-y-2">
 							<li>
-								<span className="font-medium">Model:</span> {item.modelNumber}
+								<span className="font-medium">Model:</span>
+								{item?.modelNumber ?? "Unknown"}
 							</li>
-							{item.size && (
+							{item?.size && (
 								<li>
 									<span className="font-medium">Size:</span> {item.size}
 								</li>
 							)}
-							{item.color && (
+							{item?.color && (
 								<li>
 									<span className="font-medium">Color:</span> {item.color}
 								</li>
 							)}
 							<li>
-								<span className="font-medium">Availability:</span>{" "}
-								{item.availableOnline ? "In Stock" : "Out of Stock"}
+								<span className="font-medium">Availability:</span>
+								{/* TODO consider marking everything ih stock */}
+								{item?.availableOnline ? "In Stock" : "Out of Stock"}
 							</li>
 						</ul>
 					</div>
-					<button className="mt-4 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-						Add to Cart
-					</button>
+					<Button className="mt-4 rounded-md px-4 py-2">Add to Cart</Button>
 				</div>
 			</div>
 		</div>

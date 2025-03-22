@@ -62,7 +62,7 @@ export default function ProductCard({
 
 	return (
 		<div className="group border-border bg-card hover:border-primary/20 relative flex flex-col overflow-hidden rounded-xl border transition-all duration-300 hover:shadow-lg">
-			<Link href={`/product/${product.itemId}`}>
+			<Link href={`/product/${product.upc}`}>
 				{/* Wishlist Button */}
 				<button className="bg-background/80 hover:bg-primary/10 hover:text-primary absolute top-4 right-4 z-10 rounded-full p-2 backdrop-blur-sm transition-all">
 					<Heart className="h-5 w-5" />

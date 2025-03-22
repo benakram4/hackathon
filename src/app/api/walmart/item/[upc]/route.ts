@@ -5,12 +5,12 @@ import { type WalmartItem } from "@/types";
 
 export async function GET(
 	request: Request,
-	{ params }: { params: Promise<{ id: string }> },
+	{ params }: { params: Promise<{ upc: string }> },
 ) {
 	try {
-		const { id } = await params;
+		const { upc } = await params;
 
-		if (!id) {
+		if (!upc) {
 			return NextResponse.json(
 				{ error: "Item ID is required" },
 				{ status: 400 },
@@ -20,7 +20,7 @@ export async function GET(
 		const headers = getWalmartApiHeaders();
 
 		const response = await fetch(
-			`https://developer.api.walmart.com/api-proxy/service/affil/product/v2/items/${id}`,
+			`https://developer.api.walmart.com/api-proxy/service/affil/product/v2/items?upc=${upc}`,
 			{
 				method: "GET",
 				headers,
@@ -29,7 +29,7 @@ export async function GET(
 
 		if (!response.ok) {
 			return NextResponse.json(
-				{ error: `Failed to fetch item with ID: ${id}` },
+				{ error: `Failed to fetch item with UPC: ${upc}` },
 				{ status: response.status },
 			);
 		}
