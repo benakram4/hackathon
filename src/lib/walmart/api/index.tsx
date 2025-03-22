@@ -15,14 +15,16 @@ export async function getWalmartItems(): Promise<WalmartItem[]> {
 	return await response.json();
 }
 
-export async function getWalmartItem(itemId: string): Promise<WalmartItem> {
-	const response = await fetch(`${baseUrl}/api/walmart/item/${itemId}`, {
+export async function getWalmartItem(
+	upc: string,
+): Promise<{ items: WalmartItem[] }> {
+	const response = await fetch(`${baseUrl}/api/walmart/item/${upc}`, {
 		method: "GET",
 	});
 
 	if (!response.ok) {
 		throw new Error(
-			`Failed to fetch item with ID: ${itemId} - Status: ${response.status}`,
+			`Failed to fetch item with ID: ${upc} - Status: ${response.status}`,
 		);
 	}
 

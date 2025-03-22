@@ -11,20 +11,20 @@ import ProductDetails from "./product-details";
 export default async function ProductPage({
 	params,
 }: {
-	params: Promise<{ id: string }>;
+	params: Promise<{ upc: string }>;
 }) {
 	const queryClient = new QueryClient();
-	const { id } = await params;
+	const { upc } = await params;
 
 	await queryClient.prefetchQuery({
-		queryKey: ["item", id],
-		queryFn: () => getWalmartItem(id),
+		queryKey: ["item", upc],
+		queryFn: () => getWalmartItem(upc),
 	});
 
 	return (
 		<HydrationBoundary state={dehydrate(queryClient)}>
 			<div className="flex min-h-screen items-center justify-center">
-				<ProductDetails itemId={id} />
+				<ProductDetails upc={upc} />
 			</div>
 		</HydrationBoundary>
 	);

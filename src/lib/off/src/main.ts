@@ -64,6 +64,7 @@ class OpenFoodFacts {
 			fetch: this.fetch,
 			baseUrl: this.baseUrl,
 			headers: {
+				// when deployed, use the the logged in user as the user agent
 				"User-Agent": USER_AGENT,
 			},
 		});

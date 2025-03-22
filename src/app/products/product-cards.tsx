@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useQueries } from "@tanstack/react-query";
+import { useAtom } from "jotai";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import { offDataMapAtom } from "@/atoms/off-data";
 import { Button } from "@/components/ui/button";
 import {
 	getAllCategoryIds,
@@ -15,12 +17,32 @@ import { type WalmartItem } from "@/types/walmart";
 
 import ProductCard from "./product-card";
 
+// Debounce utility function
+const useDebounce = <T,>(value: T, delay: number): T => {
+	const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+	useEffect(() => {
+		// Set debouncedValue to value after the specified delay
+		const handler = setTimeout(() => {
+			setDebouncedValue(value);
+		}, delay);
+
+		// Cancel the timeout if value changes or component unmounts
+		return () => {
+			clearTimeout(handler);
+		};
+	}, [value, delay]);
+
+	return debouncedValue;
+};
+
 export default function ProductCards() {
 	const [allProducts, setAllProducts] = useState<WalmartItem[]>([]);
 	const [currentPage, setCurrentPage] = useState(1);
 	const itemsPerPage = 10;
 	const categoryIds = getAllCategoryIds();
 	const offClient = getOffClient();
+	const [offDataMap, setOffDataMap] = useAtom(offDataMapAtom);
 
 	const categoryQueries = useQueries({
 		queries: categoryIds.map((categoryId) => ({
@@ -66,9 +88,18 @@ export default function ProductCards() {
 	const currentPageItems = getCurrentPageItems();
 	const totalPages = Math.ceil(allProducts.length / itemsPerPage);
 
-	// Fetch knowledge panel data only for visible products
+	// Add debounce to page changes
+	const debouncedPage = useDebounce(currentPage, 2000); // 2 second debounce
+	const debouncedPageItems = useRef<WalmartItem[]>([]);
+
+	useEffect(() => {
+		// Update debounced items only when the debounced page changes
+		debouncedPageItems.current = getCurrentPageItems();
+	}, [debouncedPage, allProducts]); // eslint-disable-line react-hooks/exhaustive-deps
+
+	// Fetch knowledge panel data only for visible products after debounce
 	const knowledgePanelQueries = useQueries({
-		queries: currentPageItems.map((product) => ({
+		queries: debouncedPageItems.current.map((product) => ({
 			queryKey: ["knowledgePanel", product.itemId],
 			queryFn: async () => {
 				try {
@@ -78,6 +109,16 @@ export default function ProductCards() {
 
 					const identifier = product.upc;
 					const data = await offClient.getProductKnowledgePanels(identifier);
+
+					// When we get data, save it to the jotai atom
+					if (data && product.upc) {
+						setOffDataMap((prev) => {
+							const newMap = new Map(prev);
+							newMap.set(product.upc, data);
+							return newMap;
+						});
+					}
+
 					return data || null;
 				} catch (error) {
 					console.error(
@@ -88,9 +129,10 @@ export default function ProductCards() {
 				}
 			},
 			staleTime: 60 * 60 * 1000, // 1 hour
-			gcacheTime: 60 * 60 * 1000, // 1
+			gcacheTime: 60 * 60 * 1000, // 1 hour
 			refetchOnWindowFocus: false,
-			enabled: !!product.itemId,
+			// Only enable the query if the debounced page matches current page
+			enabled: !!product.upc && debouncedPage === currentPage,
 			retry: false,
 		})),
 	});
@@ -98,8 +140,11 @@ export default function ProductCards() {
 	// Create a map of product IDs to their knowledge panel data
 	const knowledgePanelMap = new Map();
 	knowledgePanelQueries.forEach((query, index) => {
-		if (query.data && currentPageItems[index]) {
-			knowledgePanelMap.set(currentPageItems[index].itemId, query.data);
+		if (query.data && debouncedPageItems.current[index]) {
+			knowledgePanelMap.set(
+				debouncedPageItems.current[index].itemId,
+				query.data,
+			);
 		}
 	});
 
@@ -180,11 +225,13 @@ export default function ProductCards() {
 						{isLoading && " (loading more...)"}
 						<span className="text-muted-foreground ml-2 text-sm font-normal">
 							Showing page {currentPage} of {totalPages} (10 products per page)
+							{debouncedPage !== currentPage &&
+								" - Loading sustainability data..."}
 						</span>
 					</div>
 
 					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-						{currentPageItems.map((product: WalmartItem) => (
+						{debouncedPageItems.current.map((product: WalmartItem) => (
 							<ProductCard
 								key={product.itemId}
 								product={product}
