@@ -10,6 +10,7 @@ import {
 	getAllCategoryIds,
 	getWalmartItemsByCategory,
 } from "@/lib/walmart/api";
+import { getOffClient } from "@/providers/get-off-client";
 import { type WalmartItem } from "@/types/walmart";
 
 import ProductCard from "./product-card";
@@ -17,8 +18,9 @@ import ProductCard from "./product-card";
 export default function ProductCards() {
 	const [allProducts, setAllProducts] = useState<WalmartItem[]>([]);
 	const [currentPage, setCurrentPage] = useState(1);
-	const itemsPerPage = 24;
+	const itemsPerPage = 10;
 	const categoryIds = getAllCategoryIds();
+	const offClient = getOffClient();
 
 	const categoryQueries = useQueries({
 		queries: categoryIds.map((categoryId) => ({
@@ -63,6 +65,43 @@ export default function ProductCards() {
 
 	const currentPageItems = getCurrentPageItems();
 	const totalPages = Math.ceil(allProducts.length / itemsPerPage);
+
+	// Fetch knowledge panel data only for visible products
+	const knowledgePanelQueries = useQueries({
+		queries: currentPageItems.map((product) => ({
+			queryKey: ["knowledgePanel", product.itemId],
+			queryFn: async () => {
+				try {
+					if (!product.upc) {
+						return null;
+					}
+
+					const identifier = product.upc;
+					const data = await offClient.getProductKnowledgePanels(identifier);
+					return data || null;
+				} catch (error) {
+					console.error(
+						`Failed to fetch knowledge panel for product ${product.itemId}:`,
+						error,
+					);
+					return null;
+				}
+			},
+			staleTime: 60 * 60 * 1000, // 1 hour
+			gcacheTime: 60 * 60 * 1000, // 1
+			refetchOnWindowFocus: false,
+			enabled: !!product.itemId,
+			retry: false,
+		})),
+	});
+
+	// Create a map of product IDs to their knowledge panel data
+	const knowledgePanelMap = new Map();
+	knowledgePanelQueries.forEach((query, index) => {
+		if (query.data && currentPageItems[index]) {
+			knowledgePanelMap.set(currentPageItems[index].itemId, query.data);
+		}
+	});
 
 	// Pagination handlers
 	const goToNextPage = () => {
@@ -140,13 +179,20 @@ export default function ProductCards() {
 						{allProducts.length} products found
 						{isLoading && " (loading more...)"}
 						<span className="text-muted-foreground ml-2 text-sm font-normal">
-							Showing page {currentPage} of {totalPages}
+							Showing page {currentPage} of {totalPages} (10 products per page)
 						</span>
 					</div>
 
 					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 						{currentPageItems.map((product: WalmartItem) => (
-							<ProductCard key={product.itemId} product={product} />
+							<ProductCard
+								key={product.itemId}
+								product={product}
+								knowledgePanelData={knowledgePanelMap.get(product.itemId)}
+								isLoadingKnowledgePanel={knowledgePanelQueries.some(
+									(query) => query.isLoading && !query.data,
+								)}
+							/>
 						))}
 					</div>
 
