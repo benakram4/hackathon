@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { Heart, Leaf, ShoppingCart, Star } from "lucide-react";
+import { Heart, ShoppingCart, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import type { WalmartItem } from "@/types/walmart";
@@ -20,98 +20,43 @@ export default function ProductCard({
 	knowledgePanelData,
 	isLoadingKnowledgePanel = false,
 }: ProductCardProps) {
-	// Use sustainability data from knowledge panel if available
-	// Default to a placeholder value if not available
-	const getSustainabilityRating = () => {
-		if (isLoadingKnowledgePanel) {
-			return 0; // Show empty leaves while loading
-		}
+	// Extract Nutri-Score, Green Score, and NOVA group logos from the OFF response
+	const getLogos = (): {
+		nutriScoreLogo: string;
+		greenScoreLogo: string;
+		novaGroupLogo: string;
+	} => {
+		const defaultLogos = {
+			nutriScoreLogo:
+				"https://static.openfoodfacts.org/images/attributes/dist/nutriscore-unknown-new-en.svg",
+			greenScoreLogo:
+				"https://static.openfoodfacts.org/images/attributes/dist/green-score-unknown.svg",
+			novaGroupLogo:
+				"https://static.openfoodfacts.org/images/attributes/dist/nova-group-unknown.svg",
+		};
 
-		// First check for data from the parent component
-		// Check if environment_card and environmental_score exist and extract the grade
 		if (
-			knowledgePanelData?.product?.knowledge_panels?.environment_card
-				?.elements &&
-			knowledgePanelData?.product?.knowledge_panels?.environmental_score
-				?.title_element?.grade
+			isLoadingKnowledgePanel ||
+			!knowledgePanelData?.product?.knowledge_panels
 		) {
-			const grade =
-				knowledgePanelData.product.knowledge_panels.environmental_score
-					.title_element.grade;
-
-			// Convert Eco-Score grade to a numerical rating (A=5, B=4, C=3, D=2, E=1)
-			switch (grade) {
-				case "a":
-					return 5;
-				case "b":
-					return 4;
-				case "c":
-					return 3;
-				case "d":
-					return 2;
-				case "e":
-					return 1;
-				default:
-					return 0; // Unknown or no Eco-Score
-			}
+			return defaultLogos;
 		}
 
-		return 0;
+		const panels = knowledgePanelData.product.knowledge_panels;
+
+		return {
+			nutriScoreLogo:
+				panels.nutriscore_2023?.title_element?.icon_url ??
+				defaultLogos.nutriScoreLogo,
+			greenScoreLogo:
+				panels.environmental_score?.title_element?.icon_url ??
+				defaultLogos.greenScoreLogo,
+			novaGroupLogo:
+				panels.nova?.title_element?.icon_url ?? defaultLogos.novaGroupLogo,
+		};
 	};
 
-	const renderSustainabilityRating = (
-		rating: number = getSustainabilityRating(),
-	) => {
-		const fullLeaves = Math.floor(rating);
-		const hasHalfLeaf = rating % 1 >= 0.5;
-
-		// Determine color based on rating
-		let colorClass = "";
-		if (rating < 3) {
-			colorClass = "fill-destructive text-destructive";
-		} else if (rating < 4) {
-			colorClass = "fill-amber-500 text-amber-500";
-		} else {
-			colorClass = "fill-primary text-primary";
-		}
-
-		return (
-			<div className="flex">
-				{/* Full leaves */}
-				{Array(fullLeaves)
-					.fill(0)
-					.map((_, i) => (
-						<Leaf
-							key={`full-${i}`}
-							className={`h-3.5 w-3.5 ${colorClass}`}
-							fill="currentColor"
-						/>
-					))}
-
-				{/* Half leaf */}
-				{hasHalfLeaf && (
-					<div className="relative h-3.5 w-3.5">
-						<Leaf
-							className={`absolute top-0 left-0 h-3.5 w-3.5 ${colorClass}`}
-							fill="currentColor"
-							style={{ clipPath: "inset(0 50% 0 0)" }}
-						/>
-						<Leaf
-							className="text-muted absolute top-0 left-0 h-3.5 w-3.5"
-							style={{ clipPath: "inset(0 0 0 50%)" }}
-						/>
-					</div>
-				)}
-
-				{/* Empty leaves */}
-				{Array(5 - fullLeaves - (hasHalfLeaf ? 1 : 0))
-					.fill(0)
-					.map((_, i) => (
-						<Leaf key={`empty-${i}`} className="text-muted h-3.5 w-3.5" />
-					))}
-			</div>
-		);
-	};
+	const { nutriScoreLogo, greenScoreLogo, novaGroupLogo } = getLogos();
 
 	const isInStock = product.stock !== "Not available";
 
@@ -138,8 +83,29 @@ export default function ProductCard({
 							className="p-6"
 						/>
 					</div>
-					<div className="bg-card/80 absolute right-3 bottom-3 rounded-full px-3 py-1 shadow-md backdrop-blur-sm">
-						{renderSustainabilityRating()}
+					{/* Render Nutri-Score, Green Score, and NOVA group logos */}
+					<div className="bg-card/80 absolute bottom-3 left-3 flex items-center gap-2 rounded-full px-3 py-1 shadow-md backdrop-blur-sm">
+						<Image
+							src={nutriScoreLogo}
+							alt="Nutri-Score"
+							width={40}
+							height={40}
+							className="object-contain"
+						/>
+						<Image
+							src={greenScoreLogo}
+							alt="Green Score"
+							width={40}
+							height={40}
+							className="object-contain"
+						/>
+						<Image
+							src={novaGroupLogo}
+							alt="NOVA Group"
+							width={16}
+							height={16}
+							className="object-contain"
+						/>
 					</div>
 				</div>
 
@@ -172,7 +138,6 @@ export default function ProductCard({
 								: "Price not available"}
 						</span>
 					</div>
-					{/* TODO consider enabling out of stock as we don't really care about it  */}
 					<Button
 						className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
 						disabled={!isInStock}>
