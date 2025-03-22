@@ -3,10 +3,17 @@
 import Image from "next/image";
 
 import { useQuery } from "@tanstack/react-query";
+import { useAtomValue } from "jotai";
 
+import {
+	extractOffLogos,
+	getOffDataByUpc,
+	offDataMapAtom,
+} from "@/atoms/off-data";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getWalmartItem } from "@/lib/walmart/api";
+import { getOffClient } from "@/providers/get-off-client";
 import { type WalmartItem } from "@/types";
 
 export default function ProductDetails({ upc }: { upc: string }) {
@@ -14,6 +21,27 @@ export default function ProductDetails({ upc }: { upc: string }) {
 		queryKey: ["item", upc],
 		queryFn: () => getWalmartItem(upc),
 	});
+
+	const offDataMap = useAtomValue(offDataMapAtom);
+	const offData = getOffDataByUpc(offDataMap, upc);
+
+	// If we don't have OFF data in the atom yet, fetch it
+	const offClient = getOffClient();
+	const { data: fetchedOffData, isLoading: isLoadingOffData } = useQuery({
+		// eslint-disable-next-line @tanstack/query/exhaustive-deps
+		queryKey: ["off", upc],
+		queryFn: async () => {
+			if (offData) return offData;
+			return await offClient.getProductKnowledgePanels(upc);
+		},
+		// Only fetch if we don't already have the data
+		enabled: !!upc && !offData,
+	});
+
+	// Combine data from atom and freshly fetched data
+	const combinedOffData = offData || fetchedOffData;
+	const { nutriScoreLogo, greenScoreLogo, novaGroupLogo } =
+		extractOffLogos(combinedOffData);
 
 	if (isLoading) {
 		return <ProductDetailsSkeleton />;
@@ -46,6 +74,31 @@ export default function ProductDetails({ upc }: { upc: string }) {
 							priority
 						/>
 					)}
+
+					{/* OFF Scores */}
+					<div className="bg-card/80 absolute bottom-4 left-4 flex items-center gap-2 rounded-full px-3 py-2 shadow-md backdrop-blur-sm">
+						<Image
+							src={nutriScoreLogo}
+							alt="Nutri-Score"
+							width={50}
+							height={50}
+							className="object-contain"
+						/>
+						<Image
+							src={greenScoreLogo}
+							alt="Green Score"
+							width={50}
+							height={50}
+							className="object-contain"
+						/>
+						<Image
+							src={novaGroupLogo}
+							alt="NOVA Group"
+							width={20}
+							height={20}
+							className="object-contain"
+						/>
+					</div>
 				</div>
 				<div className="flex flex-col space-y-4">
 					<h1 className="text-3xl font-bold">{item?.name}</h1>

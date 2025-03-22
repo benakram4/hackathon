@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { Heart, ShoppingCart, Star } from "lucide-react";
 
+import { extractOffLogos } from "@/atoms/off-data";
 import { Button } from "@/components/ui/button";
 import type { WalmartItem } from "@/types/walmart";
 
@@ -20,43 +21,17 @@ export default function ProductCard({
 	knowledgePanelData,
 	isLoadingKnowledgePanel = false,
 }: ProductCardProps) {
-	// Extract Nutri-Score, Green Score, and NOVA group logos from the OFF response
-	const getLogos = (): {
-		nutriScoreLogo: string;
-		greenScoreLogo: string;
-		novaGroupLogo: string;
-	} => {
-		const defaultLogos = {
-			nutriScoreLogo:
-				"https://static.openfoodfacts.org/images/attributes/dist/nutriscore-unknown-new-en.svg",
-			greenScoreLogo:
-				"https://static.openfoodfacts.org/images/attributes/dist/green-score-unknown.svg",
-			novaGroupLogo:
-				"https://static.openfoodfacts.org/images/attributes/dist/nova-group-unknown.svg",
-		};
-
-		if (
-			isLoadingKnowledgePanel ||
-			!knowledgePanelData?.product?.knowledge_panels
-		) {
-			return defaultLogos;
-		}
-
-		const panels = knowledgePanelData.product.knowledge_panels;
-
-		return {
-			nutriScoreLogo:
-				panels.nutriscore_2023?.title_element?.icon_url ??
-				defaultLogos.nutriScoreLogo,
-			greenScoreLogo:
-				panels.environmental_score?.title_element?.icon_url ??
-				defaultLogos.greenScoreLogo,
-			novaGroupLogo:
-				panels.nova?.title_element?.icon_url ?? defaultLogos.novaGroupLogo,
-		};
-	};
-
-	const { nutriScoreLogo, greenScoreLogo, novaGroupLogo } = getLogos();
+	const { nutriScoreLogo, greenScoreLogo, novaGroupLogo } =
+		isLoadingKnowledgePanel
+			? {
+					nutriScoreLogo:
+						"https://static.openfoodfacts.org/images/attributes/dist/nutriscore-unknown-new-en.svg",
+					greenScoreLogo:
+						"https://static.openfoodfacts.org/images/attributes/dist/green-score-unknown.svg",
+					novaGroupLogo:
+						"https://static.openfoodfacts.org/images/attributes/dist/nova-group-unknown.svg",
+				}
+			: extractOffLogos(knowledgePanelData);
 
 	const isInStock = product.stock !== "Not available";
 

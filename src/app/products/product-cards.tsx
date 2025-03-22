@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useQueries } from "@tanstack/react-query";
+import { useAtom } from "jotai";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import { offDataMapAtom } from "@/atoms/off-data";
 import { Button } from "@/components/ui/button";
 import {
 	getAllCategoryIds,
@@ -40,6 +42,7 @@ export default function ProductCards() {
 	const itemsPerPage = 10;
 	const categoryIds = getAllCategoryIds();
 	const offClient = getOffClient();
+	const [offDataMap, setOffDataMap] = useAtom(offDataMapAtom);
 
 	const categoryQueries = useQueries({
 		queries: categoryIds.map((categoryId) => ({
@@ -106,6 +109,16 @@ export default function ProductCards() {
 
 					const identifier = product.upc;
 					const data = await offClient.getProductKnowledgePanels(identifier);
+
+					// When we get data, save it to the jotai atom
+					if (data && product.upc) {
+						setOffDataMap((prev) => {
+							const newMap = new Map(prev);
+							newMap.set(product.upc, data);
+							return newMap;
+						});
+					}
+
 					return data || null;
 				} catch (error) {
 					console.error(
