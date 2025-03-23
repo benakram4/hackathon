@@ -34,6 +34,7 @@ export default function RootLayout({
 					crossOrigin="anonymous"
 					src="//unpkg.com/react-scan/dist/auto.global.js"
 				/>
+				<link rel="icon" href="/favicon.ico" />
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
