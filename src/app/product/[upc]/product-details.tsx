@@ -1,9 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
+import Zoom from "react-medium-image-zoom";
+import "react-medium-image-zoom/dist/styles.css";
 
 import {
 	extractOffLogos,
@@ -11,6 +14,7 @@ import {
 	offDataMapAtom,
 } from "@/atoms/off-data";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getWalmartItem } from "@/lib/walmart/api";
 import { getOffClient } from "@/providers/get-off-client";
@@ -25,23 +29,21 @@ export default function ProductDetails({ upc }: { upc: string }) {
 	const offDataMap = useAtomValue(offDataMapAtom);
 	const offData = getOffDataByUpc(offDataMap, upc);
 
-	// If we don't have OFF data in the atom yet, fetch it
 	const offClient = getOffClient();
 	const { data: fetchedOffData, isLoading: isLoadingOffData } = useQuery({
-		// eslint-disable-next-line @tanstack/query/exhaustive-deps
-		queryKey: ["off", upc],
+		queryKey: ["off", upc, offData],
 		queryFn: async () => {
 			if (offData) return offData;
 			return await offClient.getProductKnowledgePanels(upc);
 		},
-		// Only fetch if we don't already have the data
 		enabled: !!upc && !offData,
 	});
 
-	// Combine data from atom and freshly fetched data
 	const combinedOffData = offData || fetchedOffData;
 	const { nutriScoreLogo, greenScoreLogo, novaGroupLogo } =
 		extractOffLogos(combinedOffData);
+
+	const [quantity, setQuantity] = useState(1);
 
 	if (isLoading) {
 		return <ProductDetailsSkeleton />;
@@ -58,24 +60,26 @@ export default function ProductDetails({ upc }: { upc: string }) {
 			<div className="p-8 text-center">Failed to load product details</div>
 		);
 	}
-	// Extract the first item from the items array
+
 	const item = data.items[0];
+
 	return (
 		<div className="container mx-auto p-6">
+			<div className="text-3xl font-bold">{item?.name}</div>
 			<div className="grid gap-8 md:grid-cols-2">
 				<div className="relative aspect-square rounded-lg">
 					{item?.largeImage && (
-						<Image
-							src={item.largeImage}
-							alt={item.name}
-							fill
-							className="object-cover"
-							sizes="(max-width: 768px) 100vw, 50vw"
-							priority
-						/>
+						<Zoom>
+							<Image
+								src={item.largeImage}
+								alt={item.name}
+								fill
+								className="rounded-lg object-cover"
+								sizes="(max-width: 768px) 100vw, 50vw"
+								priority
+							/>
+						</Zoom>
 					)}
-
-					{/* OFF Scores */}
 					<div className="bg-card/80 absolute bottom-4 left-4 flex items-center gap-2 rounded-full px-3 py-2 shadow-md backdrop-blur-sm">
 						<Image
 							src={nutriScoreLogo}
@@ -101,7 +105,6 @@ export default function ProductDetails({ upc }: { upc: string }) {
 					</div>
 				</div>
 				<div className="flex flex-col space-y-4">
-					<h1 className="text-3xl font-bold">{item?.name}</h1>
 					<div className="flex items-baseline gap-2">
 						<span className="text-2xl font-bold">${item?.salePrice}</span>
 						{(item?.msrp ?? 0) > (item?.salePrice ?? 0) && (
@@ -124,7 +127,7 @@ export default function ProductDetails({ upc }: { upc: string }) {
 						<h2 className="text-lg font-semibold">Details</h2>
 						<ul className="space-y-2">
 							<li>
-								<span className="font-medium">Model:</span>
+								<span className="font-medium">Model:</span>{" "}
 								{item?.modelNumber ?? "Unknown"}
 							</li>
 							{item?.size && (
@@ -138,13 +141,21 @@ export default function ProductDetails({ upc }: { upc: string }) {
 								</li>
 							)}
 							<li>
-								<span className="font-medium">Availability:</span>
-								{/* TODO consider marking everything ih stock */}
+								<span className="font-medium">Availability:</span>{" "}
 								{item?.availableOnline ? "In Stock" : "Out of Stock"}
 							</li>
 						</ul>
 					</div>
-					<Button className="mt-4 rounded-md px-4 py-2">Add to Cart</Button>
+					<div className="flex items-center space-x-4">
+						<Input
+							type="number"
+							value={quantity}
+							onChange={(e) => setQuantity(Number(e.target.value))}
+							min={1}
+							className="w-20"
+						/>
+						<Button className="rounded-md px-4 py-2">Add to Cart</Button>
+					</div>
 				</div>
 			</div>
 		</div>
