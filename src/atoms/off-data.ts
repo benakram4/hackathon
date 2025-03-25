@@ -10,6 +10,13 @@ export interface OffKnowledgePanelData {
 	status_verbose?: string;
 }
 
+// Default empty OFF data structure
+export const defaultOffData: OffKnowledgePanelData = {
+	product: { knowledge_panels: {} },
+	status: 0,
+	status_verbose: "No data available",
+};
+
 // Main atom to store all OFF data
 export const offDataMapAtom = atom<Map<string, OffKnowledgePanelData>>(
 	new Map(),
@@ -24,9 +31,8 @@ export const getOffDataByUpc = (
 	return dataMap.get(upc) || null;
 };
 
-// Utility to extract logo URLs from OFF data
 export const extractOffLogos = (
-	data: OffKnowledgePanelData | undefined,
+	data: OffKnowledgePanelData | undefined | null,
 ): {
 	nutriScoreLogo: string;
 	greenScoreLogo: string;
@@ -39,7 +45,7 @@ export const extractOffLogos = (
 			"https://static.openfoodfacts.org/images/attributes/dist/green-score-unknown.svg",
 		novaGroupLogo:
 			"https://static.openfoodfacts.org/images/attributes/dist/nova-group-unknown.svg",
-	};
+	} as const;
 
 	if (!data?.product?.knowledge_panels) {
 		return defaultLogos;

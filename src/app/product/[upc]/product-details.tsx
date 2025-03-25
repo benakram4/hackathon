@@ -9,6 +9,8 @@ import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 
 import {
+	type OffKnowledgePanelData,
+	defaultOffData,
 	extractOffLogos,
 	getOffDataByUpc,
 	offDataMapAtom,
@@ -30,14 +32,22 @@ export default function ProductDetails({ upc }: { upc: string }) {
 	const offData = getOffDataByUpc(offDataMap, upc);
 
 	const offClient = getOffClient();
-	const { data: fetchedOffData, isLoading: isLoadingOffData } = useQuery({
-		queryKey: ["off", upc, offData],
-		queryFn: async () => {
-			if (offData) return offData;
-			return await offClient.getProductKnowledgePanels(upc);
-		},
-		enabled: !!upc && !offData,
-	});
+	const { data: fetchedOffData, isLoading: isLoadingOffData } =
+		useQuery<OffKnowledgePanelData>({
+			// eslint-disable-next-line @tanstack/query/exhaustive-deps
+			queryKey: ["off", upc],
+			queryFn: async () => {
+				if (offData) return offData;
+				try {
+					const result = await offClient.getProductKnowledgePanels(upc);
+					return result || defaultOffData; // Return default if the API returns undefined
+				} catch (error) {
+					console.error("Error fetching OFF data:", error);
+					return defaultOffData; // Return default on error
+				}
+			},
+			enabled: !!upc && !offData,
+		});
 
 	const combinedOffData = offData || fetchedOffData;
 	const { nutriScoreLogo, greenScoreLogo, novaGroupLogo } =

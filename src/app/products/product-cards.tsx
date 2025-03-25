@@ -6,7 +6,7 @@ import { useQueries } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { offDataMapAtom } from "@/atoms/off-data";
+import { defaultOffData, offDataMapAtom } from "@/atoms/off-data";
 import { Button } from "@/components/ui/button";
 import {
 	getAllCategoryIds,
@@ -104,7 +104,7 @@ export default function ProductCards() {
 			queryFn: async () => {
 				try {
 					if (!product.upc) {
-						return null;
+						return defaultOffData;
 					}
 
 					const identifier = product.upc;
@@ -119,13 +119,13 @@ export default function ProductCards() {
 						});
 					}
 
-					return data || null;
+					return data || defaultOffData; // Return default if API returns undefined
 				} catch (error) {
 					console.error(
 						`Failed to fetch knowledge panel for product ${product.itemId}:`,
 						error,
 					);
-					return null;
+					return defaultOffData; // Return default on error
 				}
 			},
 			staleTime: 60 * 60 * 1000, // 1 hour
