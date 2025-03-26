@@ -3,14 +3,17 @@
 import Link from "next/link";
 import React from "react";
 
-import { ArrowRight, BarChart4, Droplets, Trash2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
 
 const CartSummary: React.FC = () => {
-	const { subtotal, getImpactMetrics } = useCart();
-	const impact = getImpactMetrics();
+	const {
+		subtotal,
+		// getImpactMetrics
+	} = useCart();
+	// const impact = getImpactMetrics();
 
 	// Assume shipping is free over $50, otherwise $5.99
 	const shipping = subtotal > 50 ? 0 : 5.99;
@@ -50,7 +53,7 @@ const CartSummary: React.FC = () => {
 			<div className="bg-primary/5 border-primary/20 mb-6 rounded-lg border p-4">
 				<h4 className="text-primary mb-3 text-sm font-medium">Your Impact</h4>
 
-				<div className="space-y-2 text-sm">
+				{/* <div className="space-y-2 text-sm">
 					<div className="flex items-center gap-2">
 						<BarChart4 className="text-primary h-4 w-4" />
 						<span>You&apos;ve saved {impact.co2Saved} of emissions</span>
@@ -65,7 +68,8 @@ const CartSummary: React.FC = () => {
 						<Trash2 className="text-primary h-4 w-4" />
 						<span>You&apos;ve reduced waste from {impact.wasteReduced}</span>
 					</div>
-				</div>
+				</div> */}
+				<div>impact will be mentioned here!</div>
 			</div>
 
 			<Button className="mb-3 w-full">

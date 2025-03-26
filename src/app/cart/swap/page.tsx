@@ -61,7 +61,7 @@ export default function SwapPage() {
 				console.log("specificCategory", specificCategory);
 
 				const response = await fetch(
-					`/api/off/category?category=${specificCategory}`,
+					`/api/off/high-eco-items?category=${specificCategory}`,
 				);
 
 				if (response.status === 404) {

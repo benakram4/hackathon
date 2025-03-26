@@ -138,7 +138,7 @@ class OpenFoodFacts {
 			params: { path: { barcode } },
 		});
 
-		return res.data?.product;
+		return res.data;
 	}
 
 	async performOCR(

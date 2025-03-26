@@ -3,25 +3,17 @@
 import React, { useEffect, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
-import {
-	Apple,
-	Leaf,
-	MapPin,
-	RefreshCw,
-	Scale,
-	ShoppingBag,
-} from "lucide-react";
+import { Apple, Leaf, MapPin, RefreshCw, Scale } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { type SwapPreference, useCart } from "@/contexts/cart-context";
-import { products } from "@/data/products";
 
 import CartItem from "./cart-item";
 import CartSummary from "./cart-summary";
 import EmptyCart from "./empty-cart";
-import SwapPage from "./swap/page";
+// import SwapPage from "./swap/page";
 import SwappedItem from "./swapped-item";
 
 const swapOptions: {
@@ -44,11 +36,12 @@ const swapOptions: {
 ];
 
 // Items that are frequently bought together
-const frequentlyBoughtTogether = products
-	.filter(
-		(product) => product.isPopular && product.sustainability.locallySourced,
-	)
-	.slice(0, 4);
+// TODO: not needed without mock data
+// const frequentlyBoughtTogether = products
+// 	.filter(
+// 		(product) => product.isPopular && product.sustainability.locallySourced,
+// 	)
+// 	.slice(0, 4);
 
 const Cart: React.FC = () => {
 	const {
@@ -58,7 +51,7 @@ const Cart: React.FC = () => {
 		hasSwappedItems,
 		findSwapAlternatives,
 		swapItem,
-		addItem,
+		// addItem, // not needed since not adding mock data
 	} = useCart();
 	const [showSecondColumn, setShowSecondColumn] = useState(false);
 
@@ -81,7 +74,7 @@ const Cart: React.FC = () => {
 	}, [hasSwappedItems, showSecondColumn]);
 
 	// Function to handle swapping all items
-	const handleSwapAll = () => {
+	const handleSwapAll = async () => {
 		// Only process items that haven't been swapped yet
 		const itemsToSwap = items.filter((item) => !item.swappedFor);
 
@@ -90,18 +83,23 @@ const Cart: React.FC = () => {
 			return;
 		}
 
-		let swappedCount = 0;
+		const swappingRes = itemsToSwap.map(async (item) => {
+			// we are just getting single alternative for now
+			// TODO: maybe get top 5, idonno
+			const alternatives = await findSwapAlternatives(item.product.upc);
 
-		itemsToSwap.forEach((item) => {
-			const alternatives = findSwapAlternatives(item.product.id);
-
-			const alternative = alternatives[0];
-			if (alternatives.length > 0 && alternative) {
-				// Use the first alternative found
-				swapItem(item.product.id, alternative);
-				swappedCount++;
+			// get the first alternative in terms of swapping by default since that will be the most relevant
+			const alternative = alternatives?.[0];
+			if (alternative) {
+				// swapping with current item
+				swapItem(item.product.itemId, alternative);
+				return true;
 			}
+			return false;
 		});
+
+		const results = await Promise.all(swappingRes);
+		const swappedCount = results.filter(Boolean).length;
 
 		if (swappedCount > 0) {
 			toast.success(
@@ -113,13 +111,13 @@ const Cart: React.FC = () => {
 	};
 
 	// Function to add frequently bought together items to cart
-	const handleAddFrequentItem = (productId: number) => {
-		const product = products.find((p) => p.id === productId);
-		if (product) {
-			addItem(product);
-			toast.success(`${product.name} added to your cart`);
-		}
-	};
+	// const handleAddFrequentItem = (productId: number) => {
+	// 	const product = products.find((p) => p.id === productId);
+	// 	if (product) {
+	// 		addItem(product);
+	// 		toast.success(`${product.name} added to your cart`);
+	// 	}
+	// };
 
 	if (items.length === 0) {
 		return (
@@ -171,7 +169,7 @@ const Cart: React.FC = () => {
 						{/* Swap All Button */}
 						{originalItems.length > 0 && (
 							<Button
-								onClick={handleSwapAll}
+								onClick={() => void handleSwapAll()}
 								className="mt-3 flex items-center gap-2 md:mt-0">
 								<RefreshCw className="h-4 w-4" />
 								Swap All Items
@@ -181,7 +179,7 @@ const Cart: React.FC = () => {
 				</div>
 
 				{/* Swap Page */}
-				<SwapPage />
+				{/* <SwapPage /> */}
 
 				{/* Main cart layout with fixed column widths */}
 				<div className="grid grid-cols-12 gap-8">
@@ -194,8 +192,8 @@ const Cart: React.FC = () => {
 						</div>
 
 						<div className="space-y-4">
-							{originalItems.map((item) => (
-								<CartItem key={item.product.id} item={item} />
+							{originalItems.map((item, index) => (
+								<CartItem key={index} item={item} />
 							))}
 						</div>
 					</div>
@@ -217,7 +215,7 @@ const Cart: React.FC = () => {
 
 									<div className="space-y-4">
 										{swappedItems.map((item) => (
-											<SwappedItem key={item.product.id} item={item} />
+											<SwappedItem key={item.product.itemId} item={item} />
 										))}
 									</div>
 								</div>
@@ -234,7 +232,7 @@ const Cart: React.FC = () => {
 				</div>
 
 				{/* Frequently Bought Together Section */}
-				<div className="mt-16">
+				{/* <div className="mt-16">
 					<h2 className="mb-6 text-2xl font-semibold">
 						Frequently Bought Together
 					</h2>
@@ -270,7 +268,7 @@ const Cart: React.FC = () => {
 							</div>
 						))}
 					</div>
-				</div>
+				</div> */}
 			</main>
 
 			{/* <Footer /> */}

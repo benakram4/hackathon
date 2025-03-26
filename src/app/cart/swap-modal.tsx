@@ -1,10 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-import { BarChart4, Droplets, Leaf } from "lucide-react";
-
-import { Badge } from "@/components/ui/badge";
+import Spinner from "@/components/svgs/spinner";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -15,12 +13,12 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { useCart } from "@/contexts/cart-context";
-import { type Product, productAlternatives } from "@/data/products";
+import { type WalmartItem } from "@/types";
 
 interface SwapModalProps {
 	isOpen: boolean;
 	onClose: () => void;
-	originalProduct: Product;
+	originalProduct: WalmartItem;
 }
 
 const SwapModal: React.FC<SwapModalProps> = ({
@@ -28,25 +26,42 @@ const SwapModal: React.FC<SwapModalProps> = ({
 	onClose,
 	originalProduct,
 }) => {
-	const { findSwapAlternatives, swapItem, swapPreference } = useCart();
+	const { findSwapAlternatives, swapItem, swapPreference, swapLoading } =
+		useCart();
+	const [alternatives, setAlternatives] = useState<WalmartItem[] | []>([]);
 
-	const alternatives = findSwapAlternatives(originalProduct.id);
+	useEffect(() => {
+		// no need to request alternatives if the modal is not open
+		if (!isOpen) return;
 
-	const handleSwap = (alternative: Product) => {
-		swapItem(originalProduct.id, alternative);
+		const getRelevantAlternatives = async () => {
+			console.log("trying to find alternative for: ", originalProduct);
+			const alterItems = await findSwapAlternatives(originalProduct.upc);
+
+			console.log("alternatives that we got: ", alterItems);
+
+			setAlternatives(alterItems);
+		};
+
+		void getRelevantAlternatives();
+	}, [isOpen, originalProduct]);
+
+	const handleSwap = (alternative: WalmartItem) => {
+		swapItem(originalProduct.itemId, alternative);
 		onClose();
 	};
 
 	// Find the alternative data to display benefits
-	const getAlternativeData = (alternative: Product) => {
-		const alternativeData = productAlternatives.find(
-			(data) =>
-				data.sustainableAlternative.id === alternative.id ||
-				data.regularProduct.id === originalProduct.id,
-		);
+	// TODO: instead of this we need actual benefits from OFF API
+	// const getAlternativeData = (alternative: WalmartItem) => {
+	// 	const alternativeData = productAlternatives.find(
+	// 		(data) =>
+	// 			data.sustainableAlternative.id === alternative.id ||
+	// 			data.regularProduct.id === originalProduct.id,
+	// 	);
 
-		return alternativeData;
-	};
+	// 	return alternativeData;
+	// };
 
 	// Calculate price difference
 	const getPriceDifference = (originalPrice: number, newPrice: number) => {
@@ -73,18 +88,22 @@ const SwapModal: React.FC<SwapModalProps> = ({
 					</DialogDescription>
 				</DialogHeader>
 
-				{alternatives.length > 0 ? (
+				{swapLoading ? (
+					<div className="flex justify-center py-6">
+						<Spinner className="h-10 w-10" />
+					</div>
+				) : alternatives && alternatives?.length > 0 ? (
 					<div className="my-2 space-y-4">
-						{alternatives.map((alternative) => {
-							const alternativeData = getAlternativeData(alternative);
+						{alternatives?.map((alternative) => {
+							// const alternativeData = getAlternativeData(alternative);
 
 							return (
 								<div
-									key={alternative.id}
+									key={alternative.itemId}
 									className="hover:border-primary/50 hover:bg-primary/5 flex gap-3 rounded-lg border p-3 transition-colors">
 									<div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded">
 										<img
-											src={alternative.image}
+											src={alternative.thumbnailImage}
 											alt={alternative.name}
 											className="h-full w-full object-cover"
 										/>
@@ -95,19 +114,20 @@ const SwapModal: React.FC<SwapModalProps> = ({
 											<h4 className="text-sm font-medium">
 												{alternative.name}
 											</h4>
-											{alternative.sustainability.organicCertified && (
+											{/* {alternative.sustainability.organicCertified && (
 												<Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-none text-xs">
 													<Leaf className="mr-1 h-3 w-3" />
 													Organic
 												</Badge>
-											)}
+											)} */}
+											Organic or not
 										</div>
 
 										<p className="text-muted-foreground mt-1 mb-2 line-clamp-2 text-xs">
-											{alternative.description}
+											{alternative.shortDescription}
 										</p>
 
-										{alternativeData && (
+										{/* {alternativeData && (
 											<div className="grid grid-cols-3 gap-1 text-xs">
 												<div className="flex items-center gap-1">
 													<BarChart4 className="text-primary h-3 w-3" />
@@ -122,18 +142,18 @@ const SwapModal: React.FC<SwapModalProps> = ({
 													</span>
 												</div>
 											</div>
-										)}
+										)} */}
 									</div>
 
 									<div className="flex flex-col items-end justify-between">
 										<div className="text-right">
 											<div className="font-medium">
-												${alternative.price.toFixed(2)}
+												${alternative.salePrice.toFixed(2)}
 											</div>
 											<div className="text-xs">
 												{getPriceDifference(
-													originalProduct.price,
-													alternative.price,
+													originalProduct.salePrice,
+													alternative.salePrice,
 												)}
 											</div>
 										</div>

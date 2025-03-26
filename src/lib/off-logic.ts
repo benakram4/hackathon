@@ -6,6 +6,10 @@ export const getSpecificCategory = (categories: string[]) => {
 		.filter((category) => !category.trim().includes("fr:"))
 		.map((category) => category.trim());
 
+	if (!filtered.length) {
+		return "";
+	}
+
 	return filtered[filtered.length - 1];
 };
 
@@ -19,5 +23,6 @@ export const getFilteredEcoProducts = (products: offItem[]) => {
 	}
 
 	// sort products by ecoscore
-	return filteredProducts.sort((a, b) => b.ecoscore_score! - a.ecoscore_score!);
+	// @ts-expect-error we are making sure ecoscore_score existence
+	return filteredProducts.sort((a, b) => b.ecoscore_score - a.ecoscore_score);
 };

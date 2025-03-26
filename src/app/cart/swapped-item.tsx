@@ -2,15 +2,7 @@
 
 import React from "react";
 
-import {
-	AlertCircle,
-	Apple,
-	Leaf,
-	MapPin,
-	RefreshCw,
-	Scale,
-	Trash2,
-} from "lucide-react";
+import { Apple, Leaf, MapPin, RefreshCw, Scale, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,25 +29,25 @@ const SwappedItem: React.FC<SwappedItemProps> = ({ item }) => {
 	if (!item.swappedFor) return null;
 
 	const handleIncrement = () => {
-		updateQuantity(item.product.id, item.quantity + 1);
+		updateQuantity(item.product.itemId, item.quantity + 1);
 	};
 
 	const handleDecrement = () => {
 		if (item.quantity > 1) {
-			updateQuantity(item.product.id, item.quantity - 1);
+			updateQuantity(item.product.itemId, item.quantity - 1);
 		}
 	};
 
 	const handleRemove = () => {
-		removeFromCart(item.product.id);
+		removeFromCart(item.product.itemId);
 	};
 
 	const handleRevertSwap = () => {
-		revertSwap(item.product.id);
+		revertSwap(item.product.itemId);
 	};
 
-	const originalPrice = item.product.price;
-	const newPrice = item.swappedFor.price;
+	const originalPrice = item.product.salePrice;
+	const newPrice = item.swappedFor.salePrice;
 	const priceDifference = newPrice - originalPrice;
 
 	// Get swap type icon
@@ -95,7 +87,7 @@ const SwappedItem: React.FC<SwappedItemProps> = ({ item }) => {
 			<div className="flex gap-4">
 				<div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md">
 					<img
-						src={item.swappedFor.image}
+						src={item.swappedFor.thumbnailImage}
 						alt={item.swappedFor.name}
 						className="h-full w-full object-cover"
 					/>
@@ -131,10 +123,11 @@ const SwappedItem: React.FC<SwappedItemProps> = ({ item }) => {
 					</div>
 
 					<p className="text-muted-foreground mb-2 line-clamp-2 text-xs">
-						{item.swappedFor.description}
+						{item.swappedFor.shortDescription}
 					</p>
 
-					<div className="mb-2 flex flex-wrap gap-1">
+					{/* TODO: we don't have any tags from walmart data */}
+					{/* <div className="mb-2 flex flex-wrap gap-1">
 						{item.swappedFor.tags.slice(0, 2).map((tag) => (
 							<span
 								key={tag}
@@ -142,9 +135,10 @@ const SwappedItem: React.FC<SwappedItemProps> = ({ item }) => {
 								{tag}
 							</span>
 						))}
-					</div>
+					</div> */}
 
-					<div className="mt-1 flex items-center gap-1 text-xs">
+					{/* we don't have this info set or arranged from OFF yet */}
+					{/* <div className="mt-1 flex items-center gap-1 text-xs">
 						<AlertCircle className="text-primary h-3 w-3" />
 						<span className="text-primary-foreground">
 							{item.swappedFor.sustainability.carbonFootprint === "low"
@@ -155,7 +149,7 @@ const SwappedItem: React.FC<SwappedItemProps> = ({ item }) => {
 										? "Organic certified"
 										: "Better alternative"}
 						</span>
-					</div>
+					</div> */}
 				</div>
 			</div>
 
@@ -163,7 +157,7 @@ const SwappedItem: React.FC<SwappedItemProps> = ({ item }) => {
 				<div>
 					<div className="flex items-center">
 						<span className="mr-2 font-medium">
-							${item.swappedFor.price.toFixed(2)}
+							${item.swappedFor.salePrice.toFixed(2)}
 						</span>
 
 						{priceDifference !== 0 && (
