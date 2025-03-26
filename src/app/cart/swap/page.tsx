@@ -5,7 +5,10 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { getSpecificCategory } from "@/lib/off-logic";
 import OpenFoodFacts, { type ProductV2 as offItem } from "@/lib/off/src/main";
+import { getOffClient } from "@/providers/get-off-client";
 import { type SearchResponse } from "@/types";
+
+/* eslint-disable @next/next/no-img-element */
 
 export default function SwapPage() {
 	const [walmartItem, setWalmartItem] = useState<SearchResponse | undefined>(
@@ -17,6 +20,27 @@ export default function SwapPage() {
 	const [offSwapItems, setOffSwapItems] = useState<offItem | undefined>(
 		undefined,
 	);
+
+	const [offProductKnowledgePanels, setOffProductKnowledgePanels] = useState<
+		offItem | undefined
+	>(undefined);
+	const offClient = getOffClient();
+
+	useEffect(() => {
+		const fetchProductKnowledgePanels = async () => {
+			try {
+				const products =
+					await offClient.getProductKnowledgePanels("009800895007");
+
+				const data = products;
+				console.log("Product Knowledge Panels:", data);
+				setOffProductKnowledgePanels(data);
+			} catch (error) {
+				console.error("Error fetching Product Knowledge Panels:", error);
+			}
+		};
+		void fetchProductKnowledgePanels();
+	}, [offClient]);
 
 	useEffect(() => {
 		const fetchWalmartItems = async () => {
