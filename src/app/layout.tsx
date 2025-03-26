@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 
-import Footer from "@/components/landing-page/footer";
-import { Layout as NavBar } from "@/components/layout";
+import { Layout } from "@/components/layout";
 import Providers from "@/providers";
 
 import "./globals.css";
@@ -35,13 +34,14 @@ export default function RootLayout({
 					crossOrigin="anonymous"
 					src="//unpkg.com/react-scan/dist/auto.global.js"
 				/>
+				<link rel="icon" href="/favicon.ico" />
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}>
 				<Providers>
-					<NavBar />
-					<main className="container mx-auto max-w-7xl">{children}</main>
-					<Footer />
+					<Layout>
+						<main className="">{children}</main>
+					</Layout>
 				</Providers>
 			</body>
 		</html>

@@ -334,12 +334,12 @@ import { useCart } from "@/contexts/cart-context";
 
 // ! temporary navigation bar
 
-const MainNav = () => {
+const SiteHeader = () => {
 	const { totalItems } = useCart();
 
 	return (
-		<header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 w-full border-b backdrop-blur">
-			<div className="container mx-auto flex h-16 items-center justify-between px-4">
+		<header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex h-16 w-full items-center border-b backdrop-blur">
+			<div className="flex h-[--header-height] w-full items-center justify-between gap-2 px-4">
 				<Link href="/" className="flex items-center gap-2">
 					<span className="text-primary text-xl font-semibold">EcoEats</span>
 				</Link>
@@ -383,11 +383,13 @@ const MainNav = () => {
 							)}
 						</Button>
 					</Link>
-					<Button size="sm">Get Started</Button>
+					<Link href="/products">
+						<Button size="sm">Shop Now</Button>
+					</Link>
 				</div>
 			</div>
 		</header>
 	);
 };
 
-export default MainNav;
+export default SiteHeader;

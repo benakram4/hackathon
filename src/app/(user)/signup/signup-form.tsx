@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,15 +10,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { auth } from "@/lib/auth";
+import { signUpWithEmail } from "@/lib/auth";
 
 import { LoginWithGoogle } from "../login-with-google";
 
 // TODO add validation with zod and hook form
-export async function SignupForm() {
-	const user = await auth.getUser();
-	//TODO this redirect should be to handle the middleware
-	if (user) redirect("/account");
+export function SignupForm() {
 	return (
 		<Card className="flex flex-col gap-6">
 			<CardHeader>
@@ -29,7 +25,19 @@ export async function SignupForm() {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<form action={auth.signUpWithEmail}>
+				<form
+					action={async (formData: FormData) => {
+						"use server";
+						try {
+							await signUpWithEmail(formData);
+						} catch (error: unknown) {
+							console.error("Signup failed:", error);
+							if (error instanceof Error) {
+								throw error;
+							}
+							throw new Error("An unknown error occurred during signup");
+						}
+					}}>
 					<div className="flex flex-col gap-6">
 						<div className="grid gap-2">
 							<Label htmlFor="email">Email</Label>

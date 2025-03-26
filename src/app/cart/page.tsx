@@ -120,22 +120,14 @@ const Cart: React.FC = () => {
 	// };
 
 	if (items.length === 0) {
-		return (
-			// <div className="flex min-h-screen flex-col">
-			// 	<Navbar />
-			// 	<main className="container mx-auto flex-1 px-4 py-8">
-			<EmptyCart />
-			// 	</main>
-			// 	<Footer />
-			// </div>
-		);
+		return <EmptyCart />;
 	}
 
 	return (
 		<div className="flex min-h-screen flex-col">
 			{/* <Navbar /> */}
 
-			<main className="container mx-auto flex-1 px-4 py-8">
+			<div className="container mx-auto flex-1 px-4 py-8">
 				<div className="mb-8">
 					<h1 className="mb-2 text-3xl font-bold">Your Cart</h1>
 					<p className="text-muted-foreground">
@@ -269,9 +261,7 @@ const Cart: React.FC = () => {
 						))}
 					</div>
 				</div> */}
-			</main>
-
-			{/* <Footer /> */}
+			</div>
 		</div>
 	);
 };
