@@ -1,4 +1,4 @@
-import { Award, Calendar, Flame, Gift, Info, Trophy } from "lucide-react";
+import { Award, Calendar, Gift, Info, Trophy } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,6 @@ const RewardsSection = ({ user }: RewardsSectionProps) => {
 		points: 450,
 		nextTier: "Gold",
 		pointsToNextTier: 550,
-		streakDays: 12,
 		badges: [
 			{
 				id: 1,
@@ -64,7 +63,6 @@ const RewardsSection = ({ user }: RewardsSectionProps) => {
 		],
 	};
 
-	// Calculate percentage to next tier
 	const nextTierProgress = Math.min(
 		100,
 		Math.round(
@@ -82,7 +80,7 @@ const RewardsSection = ({ user }: RewardsSectionProps) => {
 			</div>
 
 			<div className="grid gap-4 md:grid-cols-3">
-				<Card className="col-span-2">
+				<Card className="col-span-3">
 					<CardHeader className="pb-2">
 						<div className="flex items-start justify-between">
 							<div>
@@ -114,28 +112,6 @@ const RewardsSection = ({ user }: RewardsSectionProps) => {
 							View Benefits
 						</Button>
 					</CardFooter>
-				</Card>
-
-				<Card>
-					<CardHeader className="pb-2">
-						<CardTitle className="flex items-center text-lg">
-							<Flame className="mr-2 h-4 w-4 text-orange-500" />
-							Your Streak
-						</CardTitle>
-						<CardDescription>Keep making sustainable choices</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<div className="flex flex-col items-center py-4">
-							<div className="mb-1 text-4xl font-bold">
-								{userData.streakDays}
-							</div>
-							<div className="text-muted-foreground">days</div>
-							<p className="mt-4 text-center text-sm">
-								{`You're on a roll! Keep making sustainable choices to maintain
-								your streak.`}
-							</p>
-						</div>
-					</CardContent>
 				</Card>
 			</div>
 

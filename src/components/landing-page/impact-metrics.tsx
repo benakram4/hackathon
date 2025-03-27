@@ -136,7 +136,7 @@ const ImpactMetrics = () => {
 									<Icon
 										className={cn(
 											"h-8 w-8",
-											stat.color.replace("bg-", "text-"),
+											// stat.color.replace("bg-", "text-"),
 										)}
 									/>
 								</div>
