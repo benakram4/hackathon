@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 						},
 						{
 							type: "file",
-							data: await fs.readFile("./src/data/canadian-products.txt"),
+							data: await fs.readFile("src/data/canadian-products.txt"),
 							mimeType: "text/plain",
 						},
 					],
