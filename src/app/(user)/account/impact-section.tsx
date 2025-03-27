@@ -126,20 +126,22 @@ const ImpactSection = ({ user }: ImpactSectionProps) => {
 				</Card>
 			</div>
 
-			<div className="grid gap-6 md:grid-cols-2">
-				<Card className="col-span-2">
-					<CardHeader>
-						<CardTitle className="flex items-center">
-							<BarChart className="mr-2 h-5 w-5" />
-							Monthly Impact
-						</CardTitle>
-						<CardDescription>
-							Your environmental savings over the last 6 months
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<div className="h-80">
+			{/* Monthly Impact Chart Row */}
+			<Card>
+				<CardHeader>
+					<CardTitle className="flex items-center">
+						<BarChart className="mr-2 h-5 w-5" />
+						Monthly Impact
+					</CardTitle>
+					<CardDescription>
+						Your environmental savings over the last 6 months
+					</CardDescription>
+				</CardHeader>
+				<CardContent className="px-2 sm:px-6">
+					<div className="h-[300px] w-full">
+						<ResponsiveContainer width="100%" height="100%">
 							<ChartContainer
+								className="h-full w-full"
 								config={{
 									co2: { label: "CO2 (kg)", color: "#16a34a" },
 									water: { label: "Water (10L)", color: "#0ea5e9" },
@@ -147,12 +149,12 @@ const ImpactSection = ({ user }: ImpactSectionProps) => {
 								}}>
 								<RechartsBarChart
 									data={monthlyImpactData}
-									margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+									margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
 									<CartesianGrid strokeDasharray="3 3" />
 									<XAxis dataKey="name" />
 									<YAxis />
 									<Tooltip content={<ChartTooltipContent />} />
-									<Legend />
+									<Legend wrapperStyle={{ paddingTop: 10 }} />
 									<Bar dataKey="co2" name="CO2 (kg)" fill="var(--color-co2)" />
 									<Bar
 										dataKey="water"
@@ -166,10 +168,13 @@ const ImpactSection = ({ user }: ImpactSectionProps) => {
 									/>
 								</RechartsBarChart>
 							</ChartContainer>
-						</div>
-					</CardContent>
-				</Card>
+						</ResponsiveContainer>
+					</div>
+				</CardContent>
+			</Card>
 
+			{/* Secondary Charts Row - becomes columns on smaller screens */}
+			<div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
 				<Card>
 					<CardHeader>
 						<CardTitle>Impact by Category</CardTitle>
