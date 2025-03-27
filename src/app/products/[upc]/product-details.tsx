@@ -44,11 +44,14 @@ const SingleProduct = ({ upc }: { upc: string }) => {
 					const result = await offClient.getProductKnowledgePanels(upc);
 					return result || defaultOffData; // Return default if the API returns undefined
 				} catch (error) {
-					console.error("Error fetching OFF data:", error);
+					// // not necessarily an error, just no data eg 404
+					// alert("Product not found in Open Food Facts. Please check the UPC.");
+					// console.error("Error fetching OFF data:", error);
 					return defaultOffData; // Return default on error
 				}
 			},
 			enabled: !!upc && !offData,
+			retry: false,
 		});
 
 	const combinedOffData = offData || fetchedOffData;
@@ -66,7 +69,38 @@ const SingleProduct = ({ upc }: { upc: string }) => {
 		data.items[0] === null
 	) {
 		return (
-			<div className="p-8 text-center">Failed to load product details</div>
+			<div className="flex min-h-[50vh] flex-col items-center justify-center p-8 text-center">
+				<div className="mb-6 rounded-full bg-amber-100 p-4">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						className="h-8 w-8 text-amber-600">
+						<circle cx="12" cy="12" r="10" />
+						<line x1="12" y1="8" x2="12" y2="12" />
+						<line x1="12" y1="16" x2="12.01" y2="16" />
+					</svg>
+				</div>
+				<h2 className="mb-2 text-2xl font-bold text-gray-800">
+					Product Unavailable
+				</h2>
+				<p className="mb-6 max-w-md text-gray-600">
+					This item is currently unavailable from the supplier. Please try again
+					later or browse other products.
+				</p>
+				<Button asChild>
+					<Link href="/products" className="flex items-center gap-2">
+						<ChevronLeft className="h-4 w-4" />
+						Back to Products
+					</Link>
+				</Button>
+			</div>
 		);
 	}
 
