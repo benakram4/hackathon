@@ -22,7 +22,7 @@ export async function GET(
 		const numItems = searchParams.get("numItems");
 		const responseGroup = searchParams.get("responseGroup");
 		const facet = searchParams.get("facet");
-		const facetFilter = searchParams.get("facet.filter");
+		const facetFilter = searchParams.get("/api/walmart/item/");
 		const facetRange = searchParams.get("facet.range");
 
 		// Build the URL
