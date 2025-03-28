@@ -151,27 +151,6 @@ class OpenFoodFacts {
 	 * and by the official mobile application.
 	 * @param barcode Barcode of the product you want to fetch knowledge panels for
 	 */
-	async getProductKnowledgePanels(
-		barcode: string,
-	): Promise<ProductV2 | undefined> {
-		const res = await this.rawv2.GET("/api/v2/product/{barcode}", {
-			params: {
-				path: { barcode },
-				query: { fields: "knowledge_panels" },
-			},
-		});
-
-		return res.data;
-	}
-
-	/**
-	 * Author: Ben Akram
-	 * Get Knowledge panels for a specific product by barcode
-	 * @description Knowledge panels gives high level information about a product,
-	 * ready to display. This is used by the Open Food Facts website
-	 * and by the official mobile application.
-	 * @param barcode Barcode of the product you want to fetch knowledge panels for
-	 */
 	async getProductKnowledgePanels(barcode: string) {
 		const res = await this.rawv2.GET("/api/v2/product/{barcode}", {
 			params: {

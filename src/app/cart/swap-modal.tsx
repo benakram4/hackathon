@@ -40,7 +40,13 @@ const SwapModal: React.FC<SwapModalProps> = ({
 
 			console.log("alternatives that we got: ", alterItems);
 
-			setAlternatives(alterItems);
+			// filter out product details out of extra data
+			// exception is ok since we are making sure that we have details
+			const products: WalmartItem[] = alterItems.map((item) => {
+				return { ...item.details! };
+			});
+
+			setAlternatives(products);
 		};
 
 		void getRelevantAlternatives();

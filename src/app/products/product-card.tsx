@@ -3,12 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { useAtom } from "jotai";
+// import { useAtom } from "jotai";
 import { Heart, ShoppingCart, Star } from "lucide-react";
 
 import { extractOffLogos } from "@/atoms/off-data";
 import { Button } from "@/components/ui/button";
-import { shoppingCartAtom } from "@/store";
+// import { shoppingCartAtom } from "@/store";
+import { useCart } from "@/contexts/cart-context";
 import type { WalmartItem } from "@/types/walmart";
 
 interface ProductCardProps {
@@ -23,8 +24,9 @@ export default function ProductCard({
 	knowledgePanelData,
 	isLoadingKnowledgePanel = false,
 }: ProductCardProps) {
-	const [shoppingCart, setShoppingCart] = useAtom(shoppingCartAtom);
-	const inCart = shoppingCart.some((item) => item.itemId === product.itemId);
+	// const [shoppingCart, setShoppingCart] = useAtom(shoppingCartAtom);
+	const { items, addToCart, removeFromCart } = useCart();
+	const inCart = items.some((item) => item.product.itemId === product.itemId);
 
 	const { nutriScoreLogo, greenScoreLogo, novaGroupLogo } =
 		isLoadingKnowledgePanel
@@ -41,17 +43,17 @@ export default function ProductCard({
 	const isInStock = product.stock !== "Not available";
 
 	// update cart based on product availability in cart
-	const updateCart = () => {
+	const updateCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.preventDefault();
+		e.stopPropagation();
 		if (inCart) {
 			// Remove product from cart
-			setShoppingCart((prevCart) =>
-				prevCart.filter((item) => item.itemId !== product.itemId),
-			);
+			addToCart(product);
 			console.log("Removed from cart");
 		} else {
 			// Add to cart
-			setShoppingCart((prevCart) => [...prevCart, product]);
-			console.log("adding to cart");
+			removeFromCart(product.itemId);
+			console.log("added to cart");
 		}
 	};
 

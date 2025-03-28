@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 
-import OpenFoodFacts from "@/lib/off/src/main";
-
-export const off = new OpenFoodFacts(fetch, { country: "ca" });
+import { getOffClient } from "@/providers/get-off-client";
 
 export async function GET(req: Request) {
+	const off = getOffClient();
 	try {
 		const query = new URL(req.url).searchParams;
 		if (!query) {

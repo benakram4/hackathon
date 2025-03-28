@@ -20,8 +20,12 @@ export const fetchOffWalmartItems = async (upc: string) => {
 };
 
 // fetch similar but with highest eco score product from off api
-export const fetchOffSwapItem = async (item: offItemType) => {
+export const fetchOffSwapItem = async (
+	item: offItemType,
+	swapPreference: string,
+) => {
 	try {
+		console.log(`SWAP PREFERENCE: ${swapPreference}`);
 		// we need categorical_hierarchy for getting similar set of products
 		if (!item?.categories_hierarchy) {
 			console.warn(
@@ -43,11 +47,26 @@ export const fetchOffSwapItem = async (item: offItemType) => {
 
 		console.log("SPECIFIC CAT: ", specificCategory);
 
-		const response = await fetch(
-			`/api/off/high-eco-items?category=${specificCategory}`,
-		);
+		let response: Response | null = null;
 
-		if (response.status === 404) {
+		if (swapPreference == "sustainable") {
+			response = await fetch(
+				`/api/off/high-eco-items?category=${specificCategory}`,
+			);
+		} else if (swapPreference == "healthier") {
+			response = await fetch(
+				`/api/off/healthier-items?category=${specificCategory}`,
+			);
+		} else {
+			console.warn(
+				`Selected swap preference seem to be ${
+					swapPreference ?? "UNKNOWN"
+				} for swapping`,
+			);
+			return null;
+		}
+
+		if (!response.ok || !response) {
 			console.warn(`No similar product found, look at logs for more info!`);
 			return null;
 		}
@@ -55,6 +74,7 @@ export const fetchOffSwapItem = async (item: offItemType) => {
 		const data = await response.json();
 
 		if (!data) {
+			console.warn("No data received from the API.");
 			return null;
 		}
 

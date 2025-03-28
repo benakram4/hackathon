@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getFilteredAndSortedEcoProducts } from "@/lib/off-logic";
-import { pollOffApi } from "@/lib/off-logic";
+import { getFilteredNutriProducts, pollOffApi } from "@/lib/off-logic";
 import { getOffClient } from "@/providers/get-off-client";
 
 // naming convention might be confusing since we
@@ -22,8 +21,8 @@ export async function GET(req: Request) {
 
 		const allProducts = await pollOffApi({
 			offClient: off,
-			fields: "_id,ecoscore_score",
-			sortBy: "ecoscore_score",
+			fields: "_id,nutriscore_score,product_name",
+			sortBy: "nutriscore_score",
 			category,
 		});
 
@@ -34,11 +33,11 @@ export async function GET(req: Request) {
 				{ status: 404 },
 			);
 		}
+
 		console.log(`Specific Product Details: ${JSON.stringify(allProducts)}`);
 
 		// get only products with ecoscore_score available plus with the highest score (for now getting first one)
-		// expect sortiing to be done in desc order
-		const filteredProducts = getFilteredAndSortedEcoProducts(allProducts);
+		const filteredProducts = getFilteredNutriProducts(allProducts);
 
 		if (!filteredProducts || !filteredProducts.length) {
 			console.error("Maybe no corresponding products have ecoscore_score");
@@ -48,9 +47,7 @@ export async function GET(req: Request) {
 			);
 		}
 
-		// consider sending upc of top 3 sustainable products
-		return NextResponse.json(filteredProducts);
-		// return NextResponse.json([filteredProducts[0], filteredProducts[1], filteredProducts[2]]);
+		return NextResponse.json(filteredProducts.reverse());
 	} catch (error) {
 		console.error("Error fetching OFF swapped item:", error);
 		return NextResponse.json({ error: error }, { status: 500 });

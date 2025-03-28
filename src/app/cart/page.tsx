@@ -89,7 +89,7 @@ const Cart: React.FC = () => {
 			const alternatives = await findSwapAlternatives(item.product.upc);
 
 			// get the first alternative in terms of swapping by default since that will be the most relevant
-			const alternative = alternatives?.[0];
+			const alternative = alternatives?.[0]?.details;
 			if (alternative) {
 				// swapping with current item
 				swapItem(item.product.itemId, alternative);

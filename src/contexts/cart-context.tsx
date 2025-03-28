@@ -5,8 +5,10 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { fetchOffSwapItem, fetchOffWalmartItems } from "@/helper/off";
-import { fetchWalmartItem } from "@/helper/walmart";
-import { type ProductV2 as offItemType } from "@/lib/off/src/main";
+import {
+	type WalmartItemsInBulk,
+	fetchWalmartItemsInBulk,
+} from "@/helper/walmart";
 import { type WalmartItem } from "@/types";
 
 export type SwapPreference = "sustainable" | "healthier" | "local" | "balanced";
@@ -30,7 +32,9 @@ interface CartContextType {
 	addToCart: (product: WalmartItem, quantity?: number) => void;
 	removeFromCart: (productId: number) => void;
 	updateQuantity: (productId: number, quantity: number) => void;
-	findSwapAlternatives: (productUpc: string) => Promise<WalmartItem[] | []>;
+	findSwapAlternatives: (
+		productUpc: string,
+	) => Promise<WalmartItemsInBulk[] | []>;
 	swapItem: (
 		originalProductId: number,
 		alternativeProduct: WalmartItem,
@@ -153,20 +157,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 			}
 
 			// get swapped product from off api
-			const offSwapItem: offItemType = await fetchOffSwapItem(walmartOffItem);
+			// expect getting array with upc of top 3 products with highest eco score
+			const offSwapItems: { _id: string; environmental_score_score: string }[] =
+				await fetchOffSwapItem(walmartOffItem, swapPreference);
 
-			if (!offSwapItem) {
+			if (!offSwapItems) {
 				return [];
 			}
 
-			const walmartSwapItem: WalmartItem = await fetchWalmartItem(
-				// @ts-expect-error we have check to make sure offSwapItem is not null and in that case there will always be code
-				offSwapItem?.code,
-			);
+			console.log(`found swap item for ${productUpc}`, offSwapItems);
+
+			const walmartSwapItem: WalmartItemsInBulk[] =
+				await fetchWalmartItemsInBulk(offSwapItems);
 
 			console.log(`found alternatives for ${productUpc}`, walmartSwapItem);
 
-			return walmartSwapItem ? [walmartSwapItem] : [];
+			return walmartSwapItem ?? [];
 		} catch (error) {
 			console.error("Error finding swap alternatives:", error);
 			return [];
