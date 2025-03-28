@@ -60,6 +60,7 @@ export async function updateUserAddress(
 		console.log("address", address);
 		const { $id, ...addressData } = address;
 		// if the address does not contain $id, it means it's a new address
+		// TODO: Refactor this into a separate function and change the logic in address-section.tsx accordingly
 		if (!$id) {
 			const documentId = uuidv4().replace(/-/g, "").slice(0, 20);
 			const { $id: createdDocumentId } = await databases.createDocument(
