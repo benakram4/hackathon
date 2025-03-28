@@ -1,16 +1,27 @@
-import { Activity, Leaf, ShieldCheck } from "lucide-react";
+"use client";
 
+import { useEffect, useState } from "react";
+
+import { useAtom } from "jotai";
+import { Activity, Leaf, ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
+
+import {
+	RESET,
+	type ShopPreferences,
+	shopPreferencesAtom,
+} from "@/atoms/shop-preference";
 import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-// TODO probable should be stored as enum in the db and as type in the frontend
 const importanceOptions = [
 	{ value: "not-important", label: "Not important" },
 	{ value: "important", label: "Important" },
@@ -20,9 +31,19 @@ const importanceOptions = [
 
 const PreferenceItem = ({
 	title,
+	category,
+	value,
+	onChange,
 	description,
 }: {
 	title: string;
+	category: keyof ShopPreferences;
+	value?: string;
+	onChange: (
+		category: keyof ShopPreferences,
+		key: string,
+		value: string,
+	) => void;
 	description?: string;
 }) => (
 	<div className="mb-6 space-y-2">
@@ -30,7 +51,8 @@ const PreferenceItem = ({
 			<h4 className="text-sm font-medium">{title}</h4>
 		</div>
 		<RadioGroup
-			defaultValue="not-important"
+			value={value || "not-important"}
+			onValueChange={(newValue) => onChange(category, title, newValue)}
 			className="grid grid-cols-2 gap-2 pt-2">
 			{importanceOptions.map((option) => (
 				<div key={option.value} className="flex items-center space-x-2">
@@ -53,12 +75,57 @@ const PreferenceItem = ({
 );
 
 const PreferencesSection = () => {
+	const [preferences, setPreferences] = useAtom(shopPreferencesAtom);
+	const [hasChanges, setHasChanges] = useState(false);
+
+	useEffect(() => {
+		toast.info(
+			"Work in progress! Saving your preferences will impact the swap algorithm and search sorting in the future.",
+		);
+	}, []);
+
+	const handlePreferenceChange = (
+		category: keyof ShopPreferences,
+		key: string,
+		value: string,
+	) => {
+		setPreferences((prev) => ({
+			...prev,
+			[category]: {
+				...prev[category],
+				[key]: value,
+			},
+		}));
+		setHasChanges(true);
+	};
+
+	const handleSavePreferences = () => {
+		toast.success("Preferences saved successfully!");
+		setHasChanges(false);
+	};
+
+	const handleResetPreferences = () => {
+		setPreferences(RESET);
+		toast.info("Preferences have been reset to defaults");
+		setHasChanges(false);
+	};
+
 	return (
 		<div className="space-y-6">
 			<div className="flex items-center justify-between">
 				<h2 className="text-2xl font-bold">Shopping & Food Preferences</h2>
-				<Button>Save Preferences</Button>
+				<Button onClick={handleSavePreferences} disabled={!hasChanges}>
+					{hasChanges ? "Save Changes" : "Saved"}
+				</Button>
 			</div>
+
+			<Alert variant="default" className="mb-4">
+				<AlertTitle>Work in Progress</AlertTitle>
+				<AlertDescription>
+					This feature is still under development. Your preferences will impact
+					product recommendations and search results in future updates.
+				</AlertDescription>
+			</Alert>
 
 			<div className="bg-background rounded-lg border p-4">
 				<div className="mb-6">
@@ -66,7 +133,7 @@ const PreferencesSection = () => {
 						Your preferences are kept in your browser and never sent to any
 						third party.
 					</p>
-					<Button variant="outline" size="sm">
+					<Button variant="outline" size="sm" onClick={handleResetPreferences}>
 						Use Default Preferences
 					</Button>
 				</div>
@@ -84,11 +151,40 @@ const PreferencesSection = () => {
 							</div>
 						</AccordionTrigger>
 						<AccordionContent className="pl-11">
-							<PreferenceItem title="Good nutritional quality (Nutri-Score)" />
-							<PreferenceItem title="Salt in low quantity" />
-							<PreferenceItem title="Sugars in low quantity" />
-							<PreferenceItem title="Fat in low quantity" />
-							<PreferenceItem title="Saturated fat in low quantity" />
+							<PreferenceItem
+								title="Good nutritional quality (Nutri-Score)"
+								category="nutritional"
+								value={
+									preferences.nutritional[
+										"Good nutritional quality (Nutri-Score)"
+									]
+								}
+								onChange={handlePreferenceChange}
+							/>
+							<PreferenceItem
+								title="Salt in low quantity"
+								category="nutritional"
+								value={preferences.nutritional["Salt in low quantity"]}
+								onChange={handlePreferenceChange}
+							/>
+							<PreferenceItem
+								title="Sugars in low quantity"
+								category="nutritional"
+								value={preferences.nutritional["Sugars in low quantity"]}
+								onChange={handlePreferenceChange}
+							/>
+							<PreferenceItem
+								title="Fat in low quantity"
+								category="nutritional"
+								value={preferences.nutritional["Fat in low quantity"]}
+								onChange={handlePreferenceChange}
+							/>
+							<PreferenceItem
+								title="Saturated fat in low quantity"
+								category="nutritional"
+								value={preferences.nutritional["Saturated fat in low quantity"]}
+								onChange={handlePreferenceChange}
+							/>
 						</AccordionContent>
 					</AccordionItem>
 
@@ -102,8 +198,22 @@ const PreferencesSection = () => {
 							</div>
 						</AccordionTrigger>
 						<AccordionContent className="pl-11">
-							<PreferenceItem title="No or little food processing (NOVA group)" />
-							<PreferenceItem title="No or few additives" />
+							<PreferenceItem
+								title="No or little food processing (NOVA group)"
+								category="processing"
+								value={
+									preferences.processing[
+										"No or little food processing (NOVA group)"
+									]
+								}
+								onChange={handlePreferenceChange}
+							/>
+							<PreferenceItem
+								title="No or few additives"
+								category="processing"
+								value={preferences.processing["No or few additives"]}
+								onChange={handlePreferenceChange}
+							/>
 						</AccordionContent>
 					</AccordionItem>
 
@@ -125,22 +235,96 @@ const PreferencesSection = () => {
 							</p>
 							<div className="grid grid-cols-1 gap-x-8 md:grid-cols-2">
 								<div>
-									<PreferenceItem title="Without Gluten" />
-									<PreferenceItem title="Without Milk" />
-									<PreferenceItem title="Without Eggs" />
-									<PreferenceItem title="Without Nuts" />
-									<PreferenceItem title="Without Peanuts" />
-									<PreferenceItem title="Without Sesame seeds" />
-									<PreferenceItem title="Without Soybeans" />
+									<PreferenceItem
+										title="Without Gluten"
+										category="allergens"
+										value={preferences.allergens["Without Gluten"]}
+										onChange={handlePreferenceChange}
+									/>
+									<PreferenceItem
+										title="Without Milk"
+										category="allergens"
+										value={preferences.allergens["Without Milk"]}
+										onChange={handlePreferenceChange}
+									/>
+									<PreferenceItem
+										title="Without Eggs"
+										category="allergens"
+										value={preferences.allergens["Without Eggs"]}
+										onChange={handlePreferenceChange}
+									/>
+									<PreferenceItem
+										title="Without Nuts"
+										category="allergens"
+										value={preferences.allergens["Without Nuts"]}
+										onChange={handlePreferenceChange}
+									/>
+									<PreferenceItem
+										title="Without Peanuts"
+										category="allergens"
+										value={preferences.allergens["Without Peanuts"]}
+										onChange={handlePreferenceChange}
+									/>
+									<PreferenceItem
+										title="Without Sesame seeds"
+										category="allergens"
+										value={preferences.allergens["Without Sesame seeds"]}
+										onChange={handlePreferenceChange}
+									/>
+									<PreferenceItem
+										title="Without Soybeans"
+										category="allergens"
+										value={preferences.allergens["Without Soybeans"]}
+										onChange={handlePreferenceChange}
+									/>
 								</div>
 								<div>
-									<PreferenceItem title="Without Celery" />
-									<PreferenceItem title="Without Mustard" />
-									<PreferenceItem title="Without Lupin" />
-									<PreferenceItem title="Without Fish" />
-									<PreferenceItem title="Without Crustaceans" />
-									<PreferenceItem title="Without Molluscs" />
-									<PreferenceItem title="Without Sulphur dioxide and sulphites" />
+									<PreferenceItem
+										title="Without Celery"
+										category="allergens"
+										value={preferences.allergens["Without Celery"]}
+										onChange={handlePreferenceChange}
+									/>
+									<PreferenceItem
+										title="Without Mustard"
+										category="allergens"
+										value={preferences.allergens["Without Mustard"]}
+										onChange={handlePreferenceChange}
+									/>
+									<PreferenceItem
+										title="Without Lupin"
+										category="allergens"
+										value={preferences.allergens["Without Lupin"]}
+										onChange={handlePreferenceChange}
+									/>
+									<PreferenceItem
+										title="Without Fish"
+										category="allergens"
+										value={preferences.allergens["Without Fish"]}
+										onChange={handlePreferenceChange}
+									/>
+									<PreferenceItem
+										title="Without Crustaceans"
+										category="allergens"
+										value={preferences.allergens["Without Crustaceans"]}
+										onChange={handlePreferenceChange}
+									/>
+									<PreferenceItem
+										title="Without Molluscs"
+										category="allergens"
+										value={preferences.allergens["Without Molluscs"]}
+										onChange={handlePreferenceChange}
+									/>
+									<PreferenceItem
+										title="Without Sulphur dioxide and sulphites"
+										category="allergens"
+										value={
+											preferences.allergens[
+												"Without Sulphur dioxide and sulphites"
+											]
+										}
+										onChange={handlePreferenceChange}
+									/>
 								</div>
 							</div>
 						</AccordionContent>
@@ -156,9 +340,24 @@ const PreferencesSection = () => {
 							</div>
 						</AccordionTrigger>
 						<AccordionContent className="pl-11">
-							<PreferenceItem title="Vegan" />
-							<PreferenceItem title="Vegetarian" />
-							<PreferenceItem title="Palm oil free" />
+							<PreferenceItem
+								title="Vegan"
+								category="ingredients"
+								value={preferences.ingredients["Vegan"]}
+								onChange={handlePreferenceChange}
+							/>
+							<PreferenceItem
+								title="Vegetarian"
+								category="ingredients"
+								value={preferences.ingredients["Vegetarian"]}
+								onChange={handlePreferenceChange}
+							/>
+							<PreferenceItem
+								title="Palm oil free"
+								category="ingredients"
+								value={preferences.ingredients["Palm oil free"]}
+								onChange={handlePreferenceChange}
+							/>
 						</AccordionContent>
 					</AccordionItem>
 
@@ -174,10 +373,16 @@ const PreferencesSection = () => {
 						<AccordionContent className="pl-11">
 							<PreferenceItem
 								title="Organic farming"
+								category="labels"
+								value={preferences.labels["Organic farming"]}
+								onChange={handlePreferenceChange}
 								description="Organic products promote ecological sustainability and biodiversity."
 							/>
 							<PreferenceItem
 								title="Fair trade"
+								category="labels"
+								value={preferences.labels["Fair trade"]}
+								onChange={handlePreferenceChange}
 								description="Fair trade products help producers in developing countries."
 							/>
 						</AccordionContent>
@@ -193,8 +398,26 @@ const PreferencesSection = () => {
 							</div>
 						</AccordionTrigger>
 						<AccordionContent className="pl-11">
-							<PreferenceItem title="Low environmental impact (Green-Score)" />
-							<PreferenceItem title="Low risk of deforestation (Forest footprint)" />
+							<PreferenceItem
+								title="Low environmental impact (Green-Score)"
+								category="environment"
+								value={
+									preferences.environment[
+										"Low environmental impact (Green-Score)"
+									]
+								}
+								onChange={handlePreferenceChange}
+							/>
+							<PreferenceItem
+								title="Low risk of deforestation (Forest footprint)"
+								category="environment"
+								value={
+									preferences.environment[
+										"Low risk of deforestation (Forest footprint)"
+									]
+								}
+								onChange={handlePreferenceChange}
+							/>
 						</AccordionContent>
 					</AccordionItem>
 				</Accordion>
