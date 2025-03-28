@@ -1,6 +1,7 @@
 import { type User } from "@/lib/auth";
 
 import AddressSection from "./address-section";
+import FavoriteItems from "./favorite-items";
 import ImpactSection from "./impact-section";
 import OrderHistorySection from "./order-history-section";
 import PreferencesSection from "./preference-section";
@@ -14,7 +15,8 @@ type AccountContentProps = {
 		| "orders"
 		| "impact"
 		| "rewards"
-		| "preferences";
+		| "preferences"
+		| "favorites";
 	user: User;
 };
 
@@ -30,6 +32,8 @@ const AccountContent = ({ section, user }: AccountContentProps) => {
 			return <RewardsSection user={user} />;
 		case "preferences":
 			return <PreferencesSection />;
+		case "favorites":
+			return <FavoriteItems />;
 		default:
 			return <ProfileSection user={user} />;
 	}
