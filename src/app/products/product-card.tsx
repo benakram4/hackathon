@@ -41,7 +41,8 @@ export default function ProductCard({
 				}
 			: extractOffLogos(knowledgePanelData);
 
-	const isInStock = product.stock !== "Not available";
+	// fuck product availability
+	// const isInStock = product.stock !== "Not available";
 
 	// update cart based on product availability in cart
 	const updateCart = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -149,11 +150,10 @@ export default function ProductCard({
 					</div>
 					<Button
 						className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
-						disabled={!isInStock}
 						onClick={updateCart}>
 						<ShoppingCart className="h-4 w-4" />
 						<span className="sm:block">
-							{isInStock ? (inCart ? "Remove" : "Add to Cart") : "Sold Out"}
+							{inCart ? "Remove" : "Add to Cart"}
 						</span>
 					</Button>
 				</div>
