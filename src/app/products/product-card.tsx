@@ -49,11 +49,11 @@ export default function ProductCard({
 		e.stopPropagation();
 		if (inCart) {
 			// Remove product from cart
-			addToCart(product);
+			removeFromCart(product.itemId);
 			console.log("Removed from cart");
 		} else {
 			// Add to cart
-			removeFromCart(product.itemId);
+			addToCart(product);
 			console.log("added to cart");
 		}
 	};

@@ -11,7 +11,7 @@ export async function GET(
 		const { upc } = await params;
 		if (!upc) {
 			return NextResponse.json(
-				{ error: "Item ID is required" },
+				{ error: "Item UPC is required" },
 				{ status: 400 },
 			);
 		}
@@ -29,7 +29,6 @@ export async function GET(
 		if (!response.ok) {
 			console.error(
 				`Failed to fetch item with UPC: ${upc}, Status: ${response.status}`,
-				response.json(),
 			);
 			return NextResponse.json(
 				{ error: `Failed to fetch item with UPC: ${upc}` },

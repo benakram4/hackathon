@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
+
+import { useQuery } from "@tanstack/react-query";
 
 import Spinner from "@/components/svgs/spinner";
 import { Button } from "@/components/ui/button";
@@ -28,29 +30,44 @@ const SwapModal: React.FC<SwapModalProps> = ({
 }) => {
 	const { findSwapAlternatives, swapItem, swapPreference, swapLoading } =
 		useCart();
-	const [alternatives, setAlternatives] = useState<WalmartItem[] | []>([]);
 
-	useEffect(() => {
-		// no need to request alternatives if the modal is not open
-		if (!isOpen) return;
-
-		const getRelevantAlternatives = async () => {
-			console.log("trying to find alternative for: ", originalProduct);
-			const alterItems = await findSwapAlternatives(originalProduct.upc);
-
-			console.log("alternatives that we got: ", alterItems);
-
+	// Using useQuery to manage alternatives fetching
+	const {
+		data: alternatives,
+		isLoading: isAlternativesLoading,
+		isError: isAlternativesError,
+	} = useQuery({
+		queryKey: ["swapAlternatives", swapPreference, originalProduct.upc],
+		queryFn: () => findSwapAlternatives(originalProduct.upc),
+		enabled: isOpen, // Only fetch when modal is open
+		staleTime: 60 * 60 * 1000, // 1 hour cache
+		select: (data) => {
 			// filter out product details out of extra data
-			// exception is ok since we are making sure that we have details
-			const products: WalmartItem[] = alterItems.map((item) => {
-				return { ...item.details! };
-			});
+			return data.map((item) => ({ ...item.details! })) as WalmartItem[];
+		},
+	});
 
-			setAlternatives(products);
-		};
+	// useEffect(() => {
+	// 	// no need to request alternatives if the modal is not open
+	// 	if (!isOpen) return;
 
-		void getRelevantAlternatives();
-	}, [isOpen, originalProduct]);
+	// 	const getRelevantAlternatives = async () => {
+	// 		console.log("trying to find alternative for: ", originalProduct);
+	// 		const alterItems = await findSwapAlternatives(originalProduct.upc);
+
+	// 		console.log("alternatives that we got: ", alterItems);
+
+	// 		// filter out product details out of extra data
+	// 		// exception is ok since we are making sure that we have details
+	// 		const products: WalmartItem[] = alterItems.map((item) => {
+	// 			return { ...item.details! };
+	// 		});
+
+	// 		setAlternatives(products);
+	// 	};
+
+	// 	void getRelevantAlternatives();
+	// }, [isOpen, originalProduct]);
 
 	const handleSwap = (alternative: WalmartItem) => {
 		swapItem(originalProduct.itemId, alternative);
@@ -99,7 +116,7 @@ const SwapModal: React.FC<SwapModalProps> = ({
 						<Spinner className="h-10 w-10" />
 					</div>
 				) : alternatives && alternatives?.length > 0 ? (
-					<div className="my-2 space-y-4">
+					<div className="my-2 max-h-96 space-y-4 overflow-y-auto">
 						{alternatives?.map((alternative) => {
 							// const alternativeData = getAlternativeData(alternative);
 

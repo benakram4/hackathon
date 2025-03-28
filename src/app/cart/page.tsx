@@ -9,11 +9,12 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { type SwapPreference, useCart } from "@/contexts/cart-context";
+import { getQueryClient } from "@/providers/get-query-client";
+import { type WalmartItem } from "@/types";
 
 import CartItem from "./cart-item";
 import CartSummary from "./cart-summary";
 import EmptyCart from "./empty-cart";
-// import SwapPage from "./swap/page";
 import SwappedItem from "./swapped-item";
 
 const swapOptions: {
@@ -53,6 +54,7 @@ const Cart: React.FC = () => {
 		swapItem,
 		// addItem, // not needed since not adding mock data
 	} = useCart();
+	const queryClient = getQueryClient();
 	const [showSecondColumn, setShowSecondColumn] = useState(false);
 
 	// Filter items for each column
@@ -73,32 +75,33 @@ const Cart: React.FC = () => {
 		}
 	}, [hasSwappedItems, showSecondColumn]);
 
-	// Function to handle swapping all items
+	// Function to handle swapping all items with caching
 	const handleSwapAll = async () => {
-		// Only process items that haven't been swapped yet
-		const itemsToSwap = items.filter((item) => !item.swappedFor);
-
-		if (itemsToSwap.length === 0) {
+		if (originalItems.length === 0) {
 			toast.info("No items available to swap");
 			return;
 		}
 
-		const swappingRes = itemsToSwap.map(async (item) => {
-			// we are just getting single alternative for now
-			// TODO: maybe get top 5, idonno
-			const alternatives = await findSwapAlternatives(item.product.upc);
+		const swappingPromises = originalItems.map(async (item) => {
+			const alternatives = await queryClient.fetchQuery({
+				queryKey: ["swapAlternatives", swapPreference, item.product.upc],
+				queryFn: () => findSwapAlternatives(item.product.upc),
+				staleTime: 60 * 60 * 1000,
+			});
 
-			// get the first alternative in terms of swapping by default since that will be the most relevant
-			const alternative = alternatives?.[0]?.details;
-			if (alternative) {
-				// swapping with current item
-				swapItem(item.product.itemId, alternative);
+			// Filter out items that has no details and only once that are valid, this happens since we are expecting some of them to have null in 'details' fields
+			const filterTransform = alternatives.map((item) => ({
+				...item.details!,
+			})) as WalmartItem[];
+
+			if (filterTransform[0]) {
+				swapItem(item.product.itemId, filterTransform[0]);
 				return true;
 			}
 			return false;
 		});
 
-		const results = await Promise.all(swappingRes);
+		const results = await Promise.all(swappingPromises);
 		const swappedCount = results.filter(Boolean).length;
 
 		if (swappedCount > 0) {
@@ -109,6 +112,43 @@ const Cart: React.FC = () => {
 			toast.info("No suitable alternatives found for your items");
 		}
 	};
+
+	// Function to handle swapping all items
+	// const handleSwapAll = async () => {
+	// 	// Only process items that haven't been swapped yet
+	// 	const itemsToSwap = items.filter((item) => !item.swappedFor);
+
+	// 	if (itemsToSwap.length === 0) {
+	// 		toast.info("No items available to swap");
+	// 		return;
+	// 	}
+
+	// 	const swappingRes = itemsToSwap.map(async (item) => {
+	// 		// we are just getting single alternative for now
+	// 		// TODO: maybe get top 5, idonno
+	// 		const alternatives = await findSwapAlternatives(item.product.upc);
+
+	// 		// get the first alternative in terms of swapping by default since that will be the most relevant
+	// 		const alternative = alternatives?.[0]?.details;
+	// 		if (alternative) {
+	// 			// swapping with current item
+	// 			swapItem(item.product.itemId, alternative);
+	// 			return true;
+	// 		}
+	// 		return false;
+	// 	});
+
+	// 	const results = await Promise.all(swappingRes);
+	// 	const swappedCount = results.filter(Boolean).length;
+
+	// 	if (swappedCount > 0) {
+	// 		toast.success(
+	// 			`Swapped ${swappedCount} items based on your ${swapPreference} preference`,
+	// 		);
+	// 	} else {
+	// 		toast.info("No suitable alternatives found for your items");
+	// 	}
+	// };
 
 	// Function to add frequently bought together items to cart
 	// const handleAddFrequentItem = (productId: number) => {

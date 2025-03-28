@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getFilteredAndSortedEcoProducts } from "@/lib/off-logic";
-import { pollOffApi } from "@/lib/off-logic";
+import { getFilteredAndSortedEcoProducts, pollOffApi } from "@/lib/off-logic";
 import { getOffClient } from "@/providers/get-off-client";
 
 // naming convention might be confusing since we
@@ -34,7 +33,6 @@ export async function GET(req: Request) {
 				{ status: 404 },
 			);
 		}
-		console.log(`Specific Product Details: ${JSON.stringify(allProducts)}`);
 
 		// get only products with ecoscore_score available plus with the highest score (for now getting first one)
 		// expect sortiing to be done in desc order
@@ -47,10 +45,12 @@ export async function GET(req: Request) {
 				{ status: 404 },
 			);
 		}
+		console.log(
+			`Got total of: ${filteredProducts.length} products with ecoscore_score as alternative`,
+		);
 
-		// consider sending upc of top 3 sustainable products
+		// consider sending all the the products with ecoscore_score since we are checking later which ones exist in walmart, so might need to go through lot of them
 		return NextResponse.json(filteredProducts);
-		// return NextResponse.json([filteredProducts[0], filteredProducts[1], filteredProducts[2]]);
 	} catch (error) {
 		console.error("Error fetching OFF swapped item:", error);
 		return NextResponse.json({ error: error }, { status: 500 });
