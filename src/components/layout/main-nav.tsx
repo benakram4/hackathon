@@ -383,7 +383,9 @@ const SiteHeader = () => {
 							)}
 						</Button>
 					</Link>
-					<Button size="sm">Get Started</Button>
+					<Link href="/products">
+						<Button size="sm">Shop Now</Button>
+					</Link>
 				</div>
 			</div>
 		</header>

@@ -1,21 +1,35 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 
-import {
-	ChevronLeft,
-	ChevronRight,
-	Leaf,
-	ShoppingCart,
-	Star,
-} from "lucide-react";
+import { useQueries } from "@tanstack/react-query";
+import { useAtomValue, useSetAtom } from "jotai";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import ProductCard from "@/app/products/product-card";
+import { defaultOffData, offDataMapAtom } from "@/atoms/off-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useCart } from "@/contexts/cart-context";
-import { trendingProducts } from "@/data/products";
+import { getOffClient } from "@/providers/get-off-client";
+import type { WalmartItem } from "@/types/walmart";
+
+// UPCs of products we want to show
+const PRODUCT_UPCS = [
+	"071258073658", // Griffin Pancake Syrup
+	"602652171284", // KIND Nut Bars, Almond & Coconut
+	"078742230375", // Great Value Spaghetti 16oz
+	"013000006408", // Heinz Tomato Ketchup
+	"021000615261", // Kraft Singles American Cheese Slices
+	"016000170032", // Cheerios, Heart Healthy Cereal
+	"190646641016", // Oatly The Original Oat Milk
+];
 
 const TrendingProducts = () => {
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const { addToCart } = useCart();
+	const offClient = getOffClient();
+	const setOffDataMap = useSetAtom(offDataMapAtom);
+	const offDataMap = useAtomValue(offDataMapAtom);
 
 	const scroll = (direction: "left" | "right") => {
 		if (scrollContainerRef.current) {
@@ -28,10 +42,73 @@ const TrendingProducts = () => {
 		}
 	};
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const handleAddToCart = (product: any) => {
-		addToCart(product);
-	};
+	// Fetch products from Walmart API
+	const productQueries = useQueries({
+		queries: PRODUCT_UPCS.map((upc) => ({
+			queryKey: ["trendingProduct", upc],
+			queryFn: async () => {
+				const response = await fetch(`/api/walmart/item/${upc}`);
+				if (!response.ok) {
+					throw new Error(`Failed to fetch product with UPC: ${upc}`);
+				}
+				const data = (await response.json()) as { items: WalmartItem[] };
+				return data;
+			},
+			staleTime: 60 * 60 * 1000,
+			gcacheTime: 60 * 60 * 1000,
+		})),
+	});
+
+	const products = useMemo(() => {
+		return productQueries
+			.map((query) => query.data)
+			.filter((product): product is { items: WalmartItem[] } => !!product);
+	}, [productQueries.map((q) => q.dataUpdatedAt).join(",")]);
+
+	// Fetch OpenFoodFacts data for products
+	const knowledgePanelQueries = useQueries({
+		queries: products.map((product) => ({
+			queryKey: ["knowledgePanel", product?.items[0]?.upc],
+			queryFn: async () => {
+				try {
+					if (!product?.items[0]?.upc) return defaultOffData;
+					if (offDataMap.has(product?.items[0]?.upc))
+						return offDataMap.get(product?.items[0]?.upc);
+					const data = await offClient.getProductKnowledgePanels(
+						product?.items[0]?.upc,
+					);
+					if (data && product?.items[0]?.upc) {
+						setOffDataMap((prev) => {
+							const newMap = new Map(prev);
+							newMap.set(product.items[0]!.upc, data);
+							return newMap;
+						});
+					}
+					return data || defaultOffData;
+				} catch (error) {
+					return defaultOffData;
+				}
+			},
+			staleTime: 60 * 60 * 1000,
+			gcacheTime: 60 * 60 * 1000,
+			refetchOnWindowFocus: false,
+			enabled: !!product?.items[0]?.upc,
+			retry: false,
+		})),
+	});
+
+	// Create a memoized map of productId -> knowledge data
+	const knowledgePanelMap = useMemo(() => {
+		const map = new Map();
+		knowledgePanelQueries.forEach((query, index) => {
+			if (products[index]) {
+				map.set(products[index]?.items[0]?.itemId, query.data || null);
+			}
+		});
+		return map;
+	}, [products, knowledgePanelQueries.map((q) => q.dataUpdatedAt).join(",")]);
+
+	const isLoading = productQueries.some((q) => q.isLoading);
 
 	return (
 		<section id="trending" className="section-padding relative bg-white">
@@ -71,60 +148,43 @@ const TrendingProducts = () => {
 					<div
 						ref={scrollContainerRef}
 						className="hide-scrollbar flex gap-6 overflow-x-auto pb-8">
-						{trendingProducts.map((product) => (
-							<div
-								key={product.id}
-								className="group w-[280px] flex-shrink-0 overflow-hidden rounded-xl border bg-white transition-all duration-300 hover:shadow-md">
-								<div className="relative h-[200px] overflow-hidden">
-									{product.sustainability.organicCertified && (
-										<Badge className="bg-primary/90 absolute top-3 left-3 z-10 backdrop-blur-sm">
-											<Leaf className="mr-1 h-3 w-3" />
-											Organic
-										</Badge>
-									)}
-									<img
-										src={product.image}
-										alt={product.name}
-										className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-									/>
-									<div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-								</div>
-								<div className="p-4">
-									<div className="mb-2 flex items-start justify-between">
-										<h3 className="line-clamp-1 font-medium">{product.name}</h3>
-										<div className="flex items-center">
-											<Star className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500" />
-											<span className="ml-1 text-xs">{product.rating}</span>
+						{isLoading
+							? // Loading skeletons
+								Array.from({ length: 5 }).map((_, i) => (
+									<div
+										key={i}
+										className="w-[280px] flex-shrink-0 overflow-hidden rounded-xl border bg-white">
+										<div className="bg-muted/50 relative h-64 w-full">
+											<Skeleton className="h-full w-full" />
+										</div>
+										<div className="p-4">
+											<Skeleton className="h-6 w-1/2" />
+											<Skeleton className="mt-2 h-4 w-3/4" />
+											<Skeleton className="mt-2 h-4 w-full" />
+										</div>
+										<div className="border-t p-5">
+											<Skeleton className="h-10 w-20" />
 										</div>
 									</div>
-									<p className="text-muted-foreground mb-3 line-clamp-2 h-10 text-sm">
-										{product.description}
-									</p>
-									<div className="mb-3 flex flex-wrap gap-1">
-										{product.tags.slice(0, 3).map((tag) => (
-											<span
-												key={tag}
-												className="bg-secondary rounded-full px-2 py-0.5 text-xs">
-												{tag}
-											</span>
-										))}
-									</div>
-									<div className="flex items-center justify-between">
-										<span className="font-semibold">
-											${product.price.toFixed(2)}
-										</span>
-										<Button
-											size="sm"
-											variant="outline"
-											onClick={() => handleAddToCart(product)}
-											className="flex items-center gap-1">
-											<ShoppingCart className="h-3.5 w-3.5" />
-											Add to Cart
-										</Button>
-									</div>
-								</div>
-							</div>
-						))}
+								))
+							: // Real products
+								products.map((product, index) =>
+									product?.items[0]?.upc ? (
+										<div
+											key={product.items[0].upc}
+											className="w-[280px] flex-shrink-0">
+											<ProductCard
+												product={product.items[0]}
+												knowledgePanelData={knowledgePanelMap.get(
+													product.items[0].itemId,
+												)}
+												isLoadingKnowledgePanel={
+													knowledgePanelQueries?.[index]?.isLoading
+												}
+											/>
+										</div>
+									) : null,
+								)}
 					</div>
 					<div className="from-background pointer-events-none absolute top-0 right-0 bottom-0 z-10 w-16 bg-gradient-to-l to-transparent" />
 				</div>

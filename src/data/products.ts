@@ -1,3 +1,5 @@
+// TODO delete after the landing page uses real data
+
 export interface Product {
 	id: number;
 	name: string;

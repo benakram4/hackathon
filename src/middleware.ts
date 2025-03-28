@@ -17,7 +17,7 @@ export async function middleware(request: NextRequest) {
 	const user = await getUser();
 
 	if (isProtectedRoute && !user) {
-		console.log("Not User found", user);
+		// console.log("Not User found", user);
 		return NextResponse.redirect(new URL("/login", request.url));
 	}
 

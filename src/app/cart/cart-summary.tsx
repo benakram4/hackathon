@@ -1,16 +1,18 @@
 "use client";
 
-import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 
 import { ArrowRight, BarChart4, Droplets, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
 
+import CheckoutModal from "./checkout-modal";
+
 const CartSummary: React.FC = () => {
-	const { subtotal, getImpactMetrics } = useCart();
+	const { items, subtotal, getImpactMetrics } = useCart();
 	const impact = getImpactMetrics();
+	const [checkoutOpen, setCheckoutOpen] = useState(false);
 
 	// Assume shipping is free over $50, otherwise $5.99
 	const shipping = subtotal > 50 ? 0 : 5.99;
@@ -68,14 +70,18 @@ const CartSummary: React.FC = () => {
 				</div>
 			</div>
 
-			<Button className="mb-3 w-full">
+			<Button
+				className="mb-3 w-full"
+				onClick={() => setCheckoutOpen(true)}
+				disabled={items.length === 0}>
 				Proceed to Checkout
 				<ArrowRight className="ml-1 h-4 w-4" />
 			</Button>
+			<p className="text-muted-foreground text-center text-xs">
+				By checking out, you agree to our Terms of Service and Privacy Policy
+			</p>
 
-			<Button variant="outline" className="w-full" asChild>
-				<Link href="/">Continue Shopping</Link>
-			</Button>
+			<CheckoutModal open={checkoutOpen} onOpenChange={setCheckoutOpen} />
 		</div>
 	);
 };
