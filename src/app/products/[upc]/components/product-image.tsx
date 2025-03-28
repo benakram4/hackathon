@@ -22,8 +22,8 @@ export function ProductImage({
 			<div className="relative aspect-square overflow-hidden rounded-md">
 				<Zoom>
 					<Image
-						src={item?.largeImage || "/placeholder.svg?height=200&width=200"}
-						alt={item?.name || "Product Image"}
+						src={item?.largeImage ?? "/placeholder.svg?height=200&width=200"}
+						alt={item?.name ?? "Product Image"}
 						fill
 						style={{
 							objectFit: "contain",
