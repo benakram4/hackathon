@@ -1,6 +1,7 @@
 import {
 	Award,
 	BarChart,
+	Heart,
 	MapPin,
 	Package,
 	Settings,
@@ -24,7 +25,8 @@ type AccountSection =
 	| "orders"
 	| "impact"
 	| "rewards"
-	| "preferences";
+	| "preferences"
+	| "favorites";
 
 type AccountSidebarProps = {
 	activeSection: AccountSection;
@@ -104,6 +106,16 @@ export function AccountSidebar({
 									tooltip="Rewards">
 									<Award />
 									<span>Rewards Program</span>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									onClick={() => setActiveSection("favorites")}
+									isActive={activeSection === "favorites"}
+									tooltip="Favorite Items">
+									<Heart />
+									<span>Favorite Items</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
 						</SidebarMenu>
