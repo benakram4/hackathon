@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { google } from "@ai-sdk/google";
 import { generateText } from "ai";
 import { promises as fs } from "fs";
+import path from "path";
 
 export async function POST(request: Request) {
 	try {
@@ -10,6 +11,13 @@ export async function POST(request: Request) {
 			"Is the following product made by a Canadian company? If not, list some alternatives from the attached file or the web, with just their names.";
 		const { prompt } = await request.json();
 		const fullPrompt = `${context} ${prompt}`;
+
+		const filePath = path.join(
+			process.cwd(),
+			"src",
+			"data",
+			"canadian-products.txt",
+		);
 
 		const result = await generateText({
 			model: google("gemini-2.0-flash-001"),
@@ -23,7 +31,7 @@ export async function POST(request: Request) {
 						},
 						{
 							type: "file",
-							data: await fs.readFile("./src/data/canadian-products.txt"),
+							data: await fs.readFile(filePath),
 							mimeType: "text/plain",
 						},
 					],

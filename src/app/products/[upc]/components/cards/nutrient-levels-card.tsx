@@ -61,7 +61,9 @@ export function NutrientLevelsCard({ nutritionData }: { nutritionData: any }) {
 					)}
 					{nutritionData.nutrientLevels.salt && (
 						<div className="flex items-center justify-between">
-							<span>Salt</span>
+							<div className="flex items-center space-x-2">
+								<span>Salt</span>
+							</div>
 							<Badge
 								className={getNutrientLevelColor(
 									nutritionData.nutrientLevels.salt.level,

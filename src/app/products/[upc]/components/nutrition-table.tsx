@@ -45,7 +45,7 @@ export function NutritionTable({ combinedOffData }: { combinedOffData: any }) {
 										combinedOffData?.product?.knowledge_panels
 											?.nutrition_facts_table?.elements[0]?.table_element
 											?.rows[0]?.values[2]?.text as string
-									).split("<br>") || "N/A"}
+									)?.split("<br>") || "N/A"}
 								</TableCell>
 							</TableRow>
 							<TableRow>

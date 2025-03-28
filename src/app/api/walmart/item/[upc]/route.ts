@@ -9,7 +9,6 @@ export async function GET(
 ) {
 	try {
 		const { upc } = await params;
-
 		if (!upc) {
 			return NextResponse.json(
 				{ error: "Item ID is required" },
@@ -20,7 +19,7 @@ export async function GET(
 		const headers = getWalmartApiHeaders();
 
 		const response = await fetch(
-			`https://developer.api.walmart.com/api-proxy/service/affil/product/v2/items?upc=${upc}`,
+			`https://developer.api.walmart.com/api-proxy/service/affil/product/v2/items?upc=${encodeURIComponent(upc)}`,
 			{
 				method: "GET",
 				headers,

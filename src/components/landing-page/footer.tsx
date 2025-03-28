@@ -14,8 +14,8 @@ const Footer = () => {
 	const currentYear = new Date().getFullYear();
 
 	return (
-		<footer className="bg-secondary relative z-50 h-[var(--footer-height)] py-8">
-			<div className="container mx-auto">
+		<footer className="bg-secondary relative z-49 h-[var(--footer-height)] py-8">
+			<div className="bg-secondary container mx-auto">
 				<div className="mb-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
 					{/* Brand & Description */}
 					<div className="space-y-4">

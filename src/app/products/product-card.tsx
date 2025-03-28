@@ -9,6 +9,7 @@ import { Heart, ShoppingCart, Star } from "lucide-react";
 import { extractOffLogos } from "@/atoms/off-data";
 import { Button } from "@/components/ui/button";
 // import { shoppingCartAtom } from "@/store";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useCart } from "@/contexts/cart-context";
 import type { WalmartItem } from "@/types/walmart";
 
@@ -77,32 +78,43 @@ export default function ProductCard({
 							style={{
 								objectFit: "contain",
 							}}
+							sizes="(max-width: 768px) 100vw, 33vw"
 							className="p-6"
 						/>
 					</div>
 					{/* Render Nutri-Score, Green Score, and NOVA group logos */}
 					<div className="bg-card/80 absolute bottom-3 left-3 flex items-center gap-2 rounded-full px-3 py-1 shadow-md backdrop-blur-sm">
-						<Image
-							src={nutriScoreLogo}
-							alt="Nutri-Score"
-							width={40}
-							height={40}
-							className="object-contain"
-						/>
-						<Image
-							src={greenScoreLogo}
-							alt="Green Score"
-							width={40}
-							height={40}
-							className="object-contain"
-						/>
-						<Image
-							src={novaGroupLogo}
-							alt="NOVA Group"
-							width={16}
-							height={16}
-							className="object-contain"
-						/>
+						{isLoadingKnowledgePanel ? (
+							<>
+								<Skeleton className="h-4 w-4 rounded-full" />
+								<Skeleton className="h-4 w-4 rounded-full" />
+								<Skeleton className="h-4 w-4 rounded-full" />
+							</>
+						) : (
+							<>
+								<Image
+									src={nutriScoreLogo}
+									alt="Nutri-Score"
+									width={40}
+									height={40}
+									className="object-contain"
+								/>
+								<Image
+									src={greenScoreLogo}
+									alt="Green Score"
+									width={40}
+									height={40}
+									className="object-contain"
+								/>
+								<Image
+									src={novaGroupLogo}
+									alt="NOVA Group"
+									width={16}
+									height={16}
+									className="object-contain"
+								/>
+							</>
+						)}
 					</div>
 				</div>
 
