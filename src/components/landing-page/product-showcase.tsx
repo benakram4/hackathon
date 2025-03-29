@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useState } from "react";
 
 import {
@@ -113,22 +114,15 @@ const ProductShowcase = () => {
 							</div>
 						</div>
 						<div className="relative mb-6 aspect-[4/3] overflow-hidden rounded-lg">
-							<img
+							<Image
 								src={currentAlternative?.regularProduct.image}
 								alt={currentAlternative?.regularProduct.name}
 								className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+								fill
+								priority
 							/>
 						</div>
-						<div className="mt-auto">
-							<div className="flex items-center justify-between">
-								<span className="text-lg font-semibold">
-									${currentAlternative.regularProduct.price.toFixed(2)}
-								</span>
-								<Button variant="outline" size="sm">
-									View Details
-								</Button>
-							</div>
-						</div>
+						<div className="mt-auto"></div>
 					</div>
 
 					{/* Middle - Swap arrow */}
@@ -176,20 +170,15 @@ const ProductShowcase = () => {
 						</div>
 						<div className="relative mb-6 aspect-[4/3] overflow-hidden rounded-lg">
 							<div className="from-primary/10 absolute inset-0 z-10 bg-gradient-to-tr to-transparent" />
-							<img
+							<Image
 								src={currentAlternative.sustainableAlternative.image}
 								alt={currentAlternative.sustainableAlternative.name}
 								className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+								fill
+								priority
 							/>
 						</div>
-						<div className="mt-auto">
-							<div className="flex items-center justify-between">
-								<span className="text-lg font-semibold">
-									${currentAlternative.sustainableAlternative.price.toFixed(2)}
-								</span>
-								<Button size="sm">Swap Now</Button>
-							</div>
-						</div>
+						<div className="mt-auto"></div>
 					</div>
 				</div>
 

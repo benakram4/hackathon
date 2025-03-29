@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { useForm } from "@tanstack/react-form";
 import { useQueries } from "@tanstack/react-query";
 import { useAtomValue, useSetAtom } from "jotai";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -9,6 +10,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { defaultOffData, offDataMapAtom } from "@/atoms/off-data";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { searchSchema } from "@/lib/schemas/search-schema";
 import {
 	getAllCategoryIds,
 	getWalmartItemsByCategory,
@@ -21,11 +23,23 @@ import ProductCard from "./product-card";
 export default function ProductCards() {
 	const [allProducts, setAllProducts] = useState<WalmartItem[]>([]);
 	const [currentPage, setCurrentPage] = useState(1);
+	const [searchTerm, setSearchTerm] = useState("");
 	const itemsPerPage = 10;
 	const categoryIds = getAllCategoryIds();
 	const offClient = getOffClient();
 	const setOffDataMap = useSetAtom(offDataMapAtom);
 	const offDataMap = useAtomValue(offDataMapAtom);
+
+	const form = useForm({
+		defaultValues: {
+			query: "",
+		},
+		onSubmit: ({ value }) => {
+			console.log("Submitted search:", value.query);
+			setSearchTerm(value.query.toLowerCase());
+			setCurrentPage(1); // Reset to page 1 when searching
+		},
+	});
 
 	const categoryQueries = useQueries({
 		queries: categoryIds.map((categoryId) => ({
@@ -36,7 +50,6 @@ export default function ProductCards() {
 		})),
 	});
 
-	// Update products as each category query resolves
 	useEffect(() => {
 		const newProducts: WalmartItem[] = [];
 		categoryQueries.forEach((query) => {
@@ -55,19 +68,25 @@ export default function ProductCards() {
 		}
 	}, [categoryQueries.map((q) => q.dataUpdatedAt).join(",")]);
 
+	const filteredProducts = useMemo(() => {
+		if (!searchTerm.trim()) return allProducts;
+
+		return allProducts.filter((product) =>
+			product.name?.toLowerCase().includes(searchTerm),
+		);
+	}, [allProducts, searchTerm]);
+
 	const isLoading = categoryQueries.some((q) => q.isLoading && !q.data);
 	const errors = categoryQueries.filter((q) => q.error).map((q) => q.error);
 
-	// Get current page items
 	const getCurrentPageItems = () => {
 		const indexOfLastItem = currentPage * itemsPerPage;
 		const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-		return allProducts.slice(indexOfFirstItem, indexOfLastItem);
+		return filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
 	};
 	const currentPageItems = getCurrentPageItems();
-	const totalPages = Math.ceil(allProducts.length / itemsPerPage);
+	const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
-	// Build knowledge queries based on currentPageItems (no debounce)
 	const knowledgePanelQueries = useQueries({
 		queries: currentPageItems.map((product) => ({
 			queryKey: ["knowledgePanel", product.itemId],
@@ -96,7 +115,6 @@ export default function ProductCards() {
 		})),
 	});
 
-	// Create a memoized map of productId -> knowledge data derived from current queries.
 	const knowledgePanelMap = useMemo(() => {
 		const map = new Map();
 		knowledgePanelQueries.forEach((query, index) => {
@@ -110,19 +128,20 @@ export default function ProductCards() {
 		knowledgePanelQueries.map((q) => q.dataUpdatedAt).join(","),
 	]);
 
-	// Pagination handlers
 	const goToNextPage = () => {
 		if (currentPage < totalPages) {
 			setCurrentPage((prev) => prev + 1);
 			window.scrollTo({ top: 0, behavior: "smooth" });
 		}
 	};
+
 	const goToPreviousPage = () => {
 		if (currentPage > 1) {
 			setCurrentPage((prev) => prev - 1);
 			window.scrollTo({ top: 0, behavior: "smooth" });
 		}
 	};
+
 	const goToPage = (pageNumber: number) => {
 		setCurrentPage(pageNumber);
 		window.scrollTo({ top: 0, behavior: "smooth" });
@@ -158,17 +177,14 @@ export default function ProductCards() {
 						<div
 							key={i}
 							className="group border-border bg-card overflow-hidden rounded-xl border transition-all duration-300 hover:shadow-lg">
-							{/* Image Skeleton */}
 							<div className="bg-muted/50 relative h-64 w-full">
 								<Skeleton className="h-full w-full" />
 							</div>
-							{/* Content Skeleton */}
 							<div className="flex-grow p-5">
 								<Skeleton className="h-6 w-1/2" />
 								<Skeleton className="mt-2 h-4 w-3/4" />
 								<Skeleton className="mt-2 h-4 w-full" />
 							</div>
-							{/* Price & Actions Skeleton */}
 							<div className="border-t p-5">
 								<Skeleton className="h-10 w-20" />
 							</div>
@@ -176,6 +192,7 @@ export default function ProductCards() {
 					))}
 				</div>
 			)}
+
 			{errors.length > 0 && (
 				<div className="text-destructive mb-4">
 					{errors.map((error, i) => (
@@ -183,15 +200,85 @@ export default function ProductCards() {
 					))}
 				</div>
 			)}
+
 			{allProducts.length > 0 && (
 				<>
+					<form
+						onSubmit={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							void form.handleSubmit();
+						}}
+						className="mb-4 w-full">
+						<form.Field
+							name="query"
+							validators={{
+								onSubmit: searchSchema,
+							}}>
+							{(field) => {
+								const showError =
+									field.state.meta.isTouched &&
+									field.state.meta.errors.length > 0;
+
+								return (
+									<div className="flex w-full gap-2">
+										{/* Input wrapper for positioning the clear button inside the input */}
+										<div className="relative w-full">
+											<input
+												id="query"
+												type="text"
+												placeholder={
+													showError
+														? "Your search cannot be empty."
+														: "Search products..."
+												}
+												value={field.state.value}
+												onChange={(e) => field.handleChange(e.target.value)}
+												className={`h-10 w-full rounded-md border p-2 pr-10 ${
+													showError
+														? "border-red-500 placeholder-red-500"
+														: "border-gray-300"
+												}`}
+											/>
+
+											{/* Clear button positioned inside the input */}
+											{field.state.value && (
+												<button
+													type="button"
+													onClick={() => {
+														field.handleChange("");
+														setSearchTerm("");
+														setCurrentPage(1);
+													}}
+													className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+													aria-label="Clear search">
+													×
+												</button>
+											)}
+										</div>
+
+										{/* Submit button sits outside the input wrapper */}
+										<Button
+											type="submit"
+											className={`h-10 flex-shrink-0 ${
+												showError ? "bg-red-500 hover:bg-red-500" : ""
+											}`}>
+											Search
+										</Button>
+									</div>
+								);
+							}}
+						</form.Field>
+					</form>
+
 					<div className="mb-2 text-lg font-semibold">
-						{allProducts.length} products found
+						{filteredProducts.length} products found
 						{isLoading && " (loading more...)"}
 						<span className="text-muted-foreground ml-2 text-sm font-normal">
 							Showing page {currentPage} of {totalPages} (10 products per page)
 						</span>
 					</div>
+
 					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 						{currentPageItems.map((product: WalmartItem, index) => (
 							<ProductCard
@@ -204,6 +291,7 @@ export default function ProductCards() {
 							/>
 						))}
 					</div>
+
 					{totalPages > 1 && (
 						<div className="mt-8 flex items-center justify-center gap-2">
 							<Button

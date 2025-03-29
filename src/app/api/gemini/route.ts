@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
 
 import { google } from "@ai-sdk/google";
-import { generateText } from "ai";
+import { generateObject } from "ai";
 import { promises as fs } from "fs";
 import path from "path";
+import { z } from "zod";
 
 export async function POST(request: Request) {
 	try {
-		const context =
-			"Is the following product made by a Canadian company? If not, list some alternatives from the attached file or the web, with just their names.";
 		const { prompt } = await request.json();
-		const fullPrompt = `${context} ${prompt}`;
 
 		const filePath = path.join(
 			process.cwd(),
@@ -19,15 +17,25 @@ export async function POST(request: Request) {
 			"canadian-products.txt",
 		);
 
-		const result = await generateText({
+		const { object } = await generateObject({
 			model: google("gemini-2.0-flash-001"),
 			messages: [
+				{
+					role: "system",
+					content:
+						"Attached is a document with categories of products the document is a user-sourced guide to products made in Canada, categorized into two sections:\n" +
+						"\n" +
+						"-   Products made in Canada by Canadian companies\n" +
+						"-   Products made in Canada by Foreign-owned companies\n" +
+						"\n" +
+						"When we send you a product name, find out if it is canadian and return a list of 3 suitable Alternative Product Names FROM the document if it is not canadian. Do not send alternative products if it is already a Canadian product.",
+				},
 				{
 					role: "user",
 					content: [
 						{
 							type: "text",
-							text: fullPrompt,
+							text: prompt,
 						},
 						{
 							type: "file",
@@ -37,10 +45,16 @@ export async function POST(request: Request) {
 					],
 				},
 			],
+			schema: z.object({
+				original_product_name: z.string(),
+				product_category: z.string(),
+				isCanadian: z.boolean(),
+				alternative_product_names: z.array(z.string()).optional(),
+			}),
 		});
 
-		console.log(result.text);
-		return NextResponse.json({ joke: result.text });
+		console.log(JSON.stringify(object));
+		return NextResponse.json(object);
 	} catch (error: unknown) {
 		console.error("Error generating joke:", error);
 		if (error instanceof Error) {
