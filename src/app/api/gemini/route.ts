@@ -46,10 +46,10 @@ export async function POST(request: Request) {
 				},
 			],
 			schema: z.object({
-				"Original Product Name": z.string(),
-				"Product Category": z.string(),
+				original_product_name: z.string(),
+				product_category: z.string(),
 				isCanadian: z.boolean(),
-				"Alternative Product Names": z.array(z.string()).optional(),
+				alternative_product_names: z.array(z.string()).optional(),
 			}),
 		});
 
