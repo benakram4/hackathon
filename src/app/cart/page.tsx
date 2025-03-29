@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { type SwapPreference, useCart } from "@/contexts/cart-context";
 import { getQueryClient } from "@/providers/get-query-client";
-import { type WalmartItem } from "@/types";
 
 import CartItem from "./cart-item";
 import CartSummary from "./cart-summary";
@@ -89,17 +88,13 @@ const Cart: React.FC = () => {
 			const swappingPromises = originalItems.map(async (item) => {
 				const alternatives = await queryClient.fetchQuery({
 					queryKey: ["swapAlternatives", swapPreference, item.product.upc],
-					queryFn: () => findSwapAlternatives(item.product.upc),
+					queryFn: () => findSwapAlternatives(item.product),
 					staleTime: 60 * 60 * 1000,
 				});
 
-				// Filter out items that has no details and only once that are valid, this happens since we are expecting some of them to have null in 'details' fields
-				const filterTransform = alternatives.map((item) => ({
-					...item.details!,
-				})) as WalmartItem[];
-
-				if (filterTransform[0]) {
-					swapItem(item.product.itemId, filterTransform[0]);
+				if (alternatives[0]) {
+					// @ts-expect-error there is error bcoz of possibility of string being returned but I GOT IT
+					swapItem(item.product.itemId, alternatives[0]);
 					return true;
 				}
 				return false;

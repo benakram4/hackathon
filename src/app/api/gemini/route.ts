@@ -53,7 +53,7 @@ export async function POST(request: Request) {
 			}),
 		});
 
-		console.log(JSON.stringify(object));
+		console.log(`here is gemini res: ${JSON.stringify(object)})`);
 		return NextResponse.json(object);
 	} catch (error: unknown) {
 		console.error("Error generating joke:", error);

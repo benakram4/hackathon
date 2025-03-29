@@ -1,4 +1,4 @@
-import { type WalmartItem, type WalmartItemsResponse } from "@/types";
+import { type WalmartItem } from "@/types";
 
 // helper function to get particular item from walmart
 export const fetchWalmartItem = async (upc: string) => {
@@ -20,10 +20,38 @@ export const fetchWalmartItem = async (upc: string) => {
 	}
 };
 
+// helper function to get particular item from walmart by search query
+export const fetchWalmartItemByQuery = async (query: string) => {
+	try {
+		const response = await fetch(`/api/walmart/search?query=${query}`);
+		if (!response.ok) {
+			return null;
+		}
+
+		const data = await response.json();
+
+		if (!data) {
+			return null;
+		}
+
+		if (data.items.length === 0) {
+			console.warn("No items found for query: ", query);
+			return null;
+		}
+
+		console.log("Walmart items got from single querying: ", data);
+
+		return data.items[0] as WalmartItem;
+	} catch (error) {
+		console.error("Error fetching Walmart items:", error);
+		return null;
+	}
+};
+
 export interface WalmartItemsInBulk {
 	upc: string;
 	available: boolean;
-	details?: WalmartItem; // Additional Walmart API response details if needed
+	details?: WalmartItem | null; // Additional Walmart API response details if needed
 }
 
 // check if the items are available in walmart in bulk (expecting array of upcs to confirm their availability respectively, info is required, in stock is walmart's problem)
@@ -32,10 +60,15 @@ export async function fetchWalmartItemsInBulk(
 	options?: {
 		maxRetries?: number; // Default 3
 		delayBetweenRequests?: number; // Default 500ms
+		onItemFound?: (item: WalmartItemsInBulk) => void; // Add progress callback
 	},
 ): Promise<WalmartItemsInBulk[]> {
 	// this options are for retrying the request to walmart api with exponential backoff
-	const { maxRetries = 3, delayBetweenRequests = 500 } = options || {};
+	const {
+		maxRetries = 3,
+		delayBetweenRequests = 500,
+		onItemFound,
+	} = options || {};
 
 	if (!items?.length) return [];
 
@@ -60,7 +93,7 @@ export async function fetchWalmartItemsInBulk(
 					let retries = 0;
 					let success = false;
 					let available = false; // this flag doesn't imply that product is in stock but instead we got data from walmart api
-					let details: WalmartItemsResponse | null = null;
+					let details: WalmartItem | null = null;
 
 					while (retries < maxRetries && !success) {
 						try {
@@ -80,12 +113,18 @@ export async function fetchWalmartItemsInBulk(
 								details = await response.json().then((data) => data.items[0]);
 								available = true;
 								success = true;
+
+								const result = { upc, available, details };
+
 								// Atomically increment and check
 								const currentCount = ++availableCount;
 								if (currentCount >= 3) {
 									shouldStop = true;
 									abortController.abort();
 								}
+
+								// Call progress callback if provided
+								if (onItemFound) onItemFound(result);
 							} else if (response.status === 429) {
 								// Rate limited - wait and retry
 								await new Promise((resolve) =>

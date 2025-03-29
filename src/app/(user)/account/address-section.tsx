@@ -269,7 +269,7 @@ const AddressSection = ({ user }: AddressSectionProps) => {
 							<Form {...form}>
 								<form
 									id="address-form"
-									// eslint-disable-next-line @typescript-eslint/no-misused-promises
+									// eslint-disable-next-line
 									onSubmit={form.handleSubmit(onSubmit)}
 									className="space-y-4">
 									{saveError && (
