@@ -39,10 +39,11 @@ const SwapModal: React.FC<SwapModalProps> = ({
 		isLoading: isAlternativesLoading,
 		isError: isAlternativesError,
 	} = useQuery({
+		// eslint-disable-next-line @tanstack/query/exhaustive-deps
 		queryKey: ["swapAlternatives", swapPreference, originalProduct.upc],
 		queryFn: async () => {
 			setProgressiveItems([]); // Reset on new fetch
-			return await findSwapAlternatives(originalProduct.upc, (items) => {
+			return await findSwapAlternatives(originalProduct, (items) => {
 				setProgressiveItems((prev) => [...prev, ...items]);
 			});
 		},
@@ -189,7 +190,7 @@ const SwapModal: React.FC<SwapModalProps> = ({
 							<Spinner className="h-10 w-10" />
 						</div>
 					</div>
-				) : alternatives && alternatives?.length > 0 ? (
+				) : Array.isArray(alternatives) && alternatives?.length > 0 ? (
 					<div className="my-2 max-h-96 space-y-4 overflow-y-auto">
 						{alternatives?.map((alternative) => {
 							// const alternativeData = getAlternativeData(alternative);
@@ -265,6 +266,14 @@ const SwapModal: React.FC<SwapModalProps> = ({
 								</div>
 							);
 						})}
+					</div>
+				) : // alternatives var is string which is only gonna happen when item attempting to swap is already local
+				typeof alternatives === "string" ? (
+					<div className="py-6 text-center">
+						<p className="text-muted-foreground">
+							{/* just a string stating that the thing you got is already local :) */}
+							{alternatives}
+						</p>
 					</div>
 				) : (
 					<div className="py-6 text-center">

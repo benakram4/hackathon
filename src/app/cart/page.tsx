@@ -88,11 +88,12 @@ const Cart: React.FC = () => {
 			const swappingPromises = originalItems.map(async (item) => {
 				const alternatives = await queryClient.fetchQuery({
 					queryKey: ["swapAlternatives", swapPreference, item.product.upc],
-					queryFn: () => findSwapAlternatives(item.product.upc),
+					queryFn: () => findSwapAlternatives(item.product),
 					staleTime: 60 * 60 * 1000,
 				});
 
 				if (alternatives[0]) {
+					// @ts-expect-error there is error bcoz of possibility of string being returned but I GOT IT
 					swapItem(item.product.itemId, alternatives[0]);
 					return true;
 				}

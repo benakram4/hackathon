@@ -20,6 +20,34 @@ export const fetchWalmartItem = async (upc: string) => {
 	}
 };
 
+// helper function to get particular item from walmart by search query
+export const fetchWalmartItemByQuery = async (query: string) => {
+	try {
+		const response = await fetch(`/api/walmart/search?query=${query}`);
+		if (!response.ok) {
+			return null;
+		}
+
+		const data = await response.json();
+
+		if (!data) {
+			return null;
+		}
+
+		if (data.items.length === 0) {
+			console.warn("No items found for query: ", query);
+			return null;
+		}
+
+		console.log("Walmart items got from single querying: ", data);
+
+		return data.items[0] as WalmartItem;
+	} catch (error) {
+		console.error("Error fetching Walmart items:", error);
+		return null;
+	}
+};
+
 export interface WalmartItemsInBulk {
 	upc: string;
 	available: boolean;
