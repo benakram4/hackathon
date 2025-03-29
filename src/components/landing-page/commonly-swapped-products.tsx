@@ -1,3 +1,5 @@
+"use client";
+
 import { useMemo, useRef } from "react";
 
 import { useQueries } from "@tanstack/react-query";
@@ -9,11 +11,10 @@ import { defaultOffData, offDataMapAtom } from "@/atoms/off-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCart } from "@/contexts/cart-context";
 import { getOffClient } from "@/providers/get-off-client";
 import type { WalmartItem } from "@/types/walmart";
 
-// UPCs of products we want to show
+// UPCs of products we want to show - commonly swapped conventional items
 const PRODUCT_UPCS = [
 	"071258073658", // Griffin Pancake Syrup
 	"602652171284", // KIND Nut Bars, Almond & Coconut
@@ -24,9 +25,8 @@ const PRODUCT_UPCS = [
 	"190646641016", // Oatly The Original Oat Milk
 ];
 
-const TrendingProducts = () => {
+const CommonlySwappedProducts = () => {
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
-	const { addToCart } = useCart();
 	const offClient = getOffClient();
 	const setOffDataMap = useSetAtom(offDataMapAtom);
 	const offDataMap = useAtomValue(offDataMapAtom);
@@ -45,7 +45,7 @@ const TrendingProducts = () => {
 	// Fetch products from Walmart API
 	const productQueries = useQueries({
 		queries: PRODUCT_UPCS.map((upc) => ({
-			queryKey: ["trendingProduct", upc],
+			queryKey: ["commonlySwappedProduct", upc],
 			queryFn: async () => {
 				const response = await fetch(`/api/walmart/item/${upc}`);
 				if (!response.ok) {
@@ -111,18 +111,22 @@ const TrendingProducts = () => {
 	const isLoading = productQueries.some((q) => q.isLoading);
 
 	return (
-		<section id="trending" className="section-padding relative bg-white">
+		<section
+			id="commonly-swapped"
+			className="section-padding relative bg-white">
 			<div className="container mx-auto px-4">
 				<div className="mb-12 flex flex-col justify-between md:flex-row md:items-end">
 					<div>
 						<Badge variant="outline" className="mb-3">
-							Popular Items
+							Commonly Swapped Items
 						</Badge>
 						<h2 className="mb-3 text-3xl font-bold md:text-4xl">
-							Trending <span className="text-primary">Eco</span> Products
+							Most Frequently <span className="text-primary">Swapped</span>{" "}
+							Products
 						</h2>
 						<p className="text-muted-foreground max-w-2xl">
-							Discover what eco-conscious shoppers are loving right now
+							These conventional products are most often swapped for
+							eco-friendly alternatives
 						</p>
 					</div>
 					<div className="mt-6 flex gap-2 md:mt-0">
@@ -193,4 +197,4 @@ const TrendingProducts = () => {
 	);
 };
 
-export default TrendingProducts;
+export default CommonlySwappedProducts;

@@ -1,15 +1,15 @@
 import BlogPosts from "./blog-posts";
+import CommonlySwappedProducts from "./commonly-swapped-products";
 import Hero from "./hero";
 import ImpactMetrics from "./impact-metrics";
 import ProductShowcase from "./product-showcase";
-import TrendingProducts from "./trending-products";
 
 export default function LandingPage() {
 	return (
 		<>
 			<Hero />
 			<ProductShowcase />
-			<TrendingProducts />
+			<CommonlySwappedProducts />
 			<ImpactMetrics />
 			<BlogPosts />
 		</>
