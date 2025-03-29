@@ -173,10 +173,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
 				// here should be check for if the flag for isCanadian is true than return
 				if (localAlternatives.isCanadian) {
-					toast.error(
+					toast.success(
 						"YAYYY, what you have currently already a Canadian product!",
 					);
-					return "YAYYY, what you have currently already a Canadian product!";
+					return "You already have a Canadian product! :grin:";
 				}
 
 				// expecting to be filled with local alternatives that we can find
