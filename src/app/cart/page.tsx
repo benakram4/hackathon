@@ -232,7 +232,7 @@ const Cart: React.FC = () => {
 
 					{/* Second Column - Swapped items */}
 					<AnimatePresence>
-						{showSecondColumn ? (
+						{showSecondColumn && swappedItems ? (
 							<motion.div
 								className="col-span-12 lg:col-span-4"
 								initial={{ opacity: 0, x: 20 }}
@@ -246,8 +246,8 @@ const Cart: React.FC = () => {
 									</div>
 
 									<div className="space-y-4">
-										{swappedItems.map((item) => (
-											<SwappedItem key={item.product.itemId} item={item} />
+										{swappedItems.map((item, index) => (
+											<SwappedItem key={index} item={item} />
 										))}
 									</div>
 								</div>

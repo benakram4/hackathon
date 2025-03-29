@@ -43,8 +43,14 @@ export default function ProductCard({
 				// Remove the product if found in favorites
 				return prev.filter((fav) => fav.walmart.upc !== product.upc);
 			}
-			// Add new favorite; setting off data as null (adjust as needed)
-			return [...prev, { walmart: product, off: null }];
+			// Add new favorite with the knowledge panel data
+			return [
+				...prev,
+				{
+					walmart: product,
+					off: knowledgePanelData || null,
+				},
+			];
 		});
 	};
 

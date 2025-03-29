@@ -51,7 +51,7 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
 				<div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md">
 					<Image
 						src={displayProduct.thumbnailImage}
-						alt={displayProduct.name}
+						alt={displayProduct.name ?? "Product Image"}
 						height={80}
 						width={80}
 						className="fill h-full w-full object-cover"
