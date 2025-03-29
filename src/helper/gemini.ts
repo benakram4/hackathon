@@ -4,13 +4,26 @@ export interface LocalAlternativesResponse {
 	original_product_name: string;
 	product_category: string;
 	isCanadian: boolean;
-	alternative_product_name: string[];
+	alternative_product_names: string[];
 }
 
 // fetch exact walmart item from off api
 export const fetchLocalAlternatives = async (product: WalmartItem) => {
 	try {
-		const response = await fetch(`/api/gemini?prompt=${product.name}`);
+		const response = await fetch(`/api/gemini?prompt=${product.name}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				prompt: product.name,
+			}),
+		});
+
+		if (!response.ok) {
+			console.error("Error fetching from Gemini:", response.statusText);
+			return null;
+		}
 
 		const data = await response.json();
 

@@ -4,7 +4,10 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 import { toast } from "sonner";
 
-import { fetchLocalAlternatives } from "@/helper/gemini";
+import {
+	type LocalAlternativesResponse,
+	fetchLocalAlternatives,
+} from "@/helper/gemini";
 import { fetchOffSwapItem, fetchOffWalmartItems } from "@/helper/off";
 import {
 	type WalmartItemsInBulk,
@@ -160,7 +163,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
 			if (swapPreference === "local") {
 				// expect product names array as response
-				const localAlternatives = await fetchLocalAlternatives(product);
+				const localAlternatives: LocalAlternativesResponse | null =
+					await fetchLocalAlternatives(product);
 
 				if (!localAlternatives) {
 					return [];
@@ -177,7 +181,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 				// expecting to be filled with local alternatives that we can find
 				const items: WalmartItem[] = [];
 
-				for (const alternative of localAlternatives) {
+				for (const alternative of localAlternatives.alternative_product_names) {
 					const item: WalmartItem | null =
 						await fetchWalmartItemByQuery(alternative);
 
