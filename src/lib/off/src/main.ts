@@ -140,7 +140,7 @@ class OpenFoodFacts {
 			params: { path: { barcode } },
 		});
 
-		return res.data?.product;
+		return res.data;
 	}
 
 	/**
@@ -204,9 +204,10 @@ class OpenFoodFacts {
 	async search(
 		fields?: string,
 		sortBy?: componentsv2["parameters"]["sort_by"],
+		filters?: Record<string, string | number>,
 	): Promise<SearchResultV2 | undefined> {
 		const res = await this.rawv2.GET("/api/v2/search", {
-			params: { query: { fields, sort_by: sortBy } },
+			params: { query: { fields, sort_by: sortBy, ...filters } },
 		});
 
 		return res.data;
