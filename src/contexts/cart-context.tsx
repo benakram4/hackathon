@@ -41,6 +41,7 @@ interface CartContextType {
 	) => void;
 	revertSwap: (productId: number) => void;
 	setSwapPreference: (preference: SwapPreference) => void;
+	clearCart: () => void;
 	// getImpactMetrics: () => {
 	// 	co2Saved: string;
 	// 	waterSaved: string;
@@ -256,7 +257,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 	const addItem = (product: WalmartItem) => {
 		addToCart(product, 1);
 	};
-
+	const clearCart = () => {
+		setItems([]);
+	};
 	const contextValue: CartContextType = {
 		items,
 		swapPreference,
@@ -273,6 +276,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 		swapItem,
 		revertSwap,
 		setSwapPreference,
+		clearCart,
 		// getImpactMetrics,
 	};
 

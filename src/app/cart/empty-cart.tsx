@@ -20,7 +20,7 @@ const EmptyCart: React.FC = () => {
 			</p>
 
 			<Button asChild>
-				<Link href="/">Find Sustainable Products</Link>
+				<Link href="/products">Find Sustainable Products</Link>
 			</Button>
 		</div>
 	);
