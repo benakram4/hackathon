@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 				{
 					role: "system",
 					content:
-						"Attatched is a document with categories of products the document is a user-sourced guide to products made in Canada, categorized into two sections:\n" +
+						"Attached is a document with categories of products the document is a user-sourced guide to products made in Canada, categorized into two sections:\n" +
 						"\n" +
 						"-   Products made in Canada by Canadian companies\n" +
 						"-   Products made in Canada by Foreign-owned companies\n" +
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
 				"Original Product Name": z.string(),
 				"Product Category": z.string(),
 				isCanadian: z.boolean(),
-				"Alternative Product Name": z.array(z.string()).optional(),
+				"Alternative Product Names": z.array(z.string()).optional(),
 			}),
 		});
 
