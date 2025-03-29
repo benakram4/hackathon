@@ -47,18 +47,18 @@ const RewardsSection = ({ user }: RewardsSectionProps) => {
 			},
 		],
 		availableRewards: [
-			{ id: 1, name: "10% Off Next Order", points: 200, expires: "2023-12-31" },
+			{ id: 1, name: "10% Off Next Order", points: 200, expires: "2025-04-28" },
 			{
 				id: 2,
 				name: "Free Eco-Friendly Tote Bag",
 				points: 350,
-				expires: "2023-12-31",
+				expires: "2025-04-28",
 			},
 			{
 				id: 3,
 				name: "Carbon Offset for Your Order",
 				points: 500,
-				expires: "2023-12-31",
+				expires: "2025-04-28",
 			},
 		],
 	};

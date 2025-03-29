@@ -22,7 +22,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 				<JotaiProvider>
 					<TooltipProvider>
 						<CartProvider>
-							<InitializeCart />
 							<Sonner />
 							{children}
 						</CartProvider>
