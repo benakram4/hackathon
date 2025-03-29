@@ -227,9 +227,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 		});
 
 		return {
-			co2Saved: `${co2Saved.toFixed(1)}kg CO2`,
-			waterSaved: `${waterSaved.toFixed(0)} liters`,
-			wasteReduced: `${wasteReduced} items`,
+			co2Saved: `${co2Saved.toFixed(1)}`,
+			waterSaved: `${waterSaved.toFixed(0)}`,
+			wasteReduced: `${wasteReduced}`,
 		};
 	};
 
