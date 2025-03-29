@@ -18,10 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCart } from "@/contexts/cart-context";
-import {
-	createUserOrdersHistory,
-	updateUserImpact,
-} from "@/lib/database/actions";
+import { createUserOrdersHistory } from "@/lib/database/actions";
 import { type OrderSwapHistory, type UserOrders } from "@/types";
 
 import ConfettiEffect from "./confettie-effect";
@@ -32,7 +29,7 @@ interface CheckoutModalProps {
 }
 
 const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
-	const { items, subtotal, getImpactMetrics } = useCart();
+	const { items, subtotal } = useCart();
 	const [orderPlaced, setOrderPlaced] = useState(false);
 
 	// Demo hardcoded values
@@ -72,13 +69,13 @@ const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 		// In a real app, this would connect to a payment processor
 		setOrderPlaced(true);
 		await createUserOrdersHistory(userOrder);
-		await updateUserImpact({
-			$id: "",
-			userId: "",
-			co2: getImpactMetrics().co2Saved as unknown as number,
-			water: getImpactMetrics().waterSaved as unknown as number,
-			waste: getImpactMetrics().wasteReduced as unknown as number,
-		});
+		// await updateUserImpact({
+		// 	$id: "",
+		// 	userId: "",
+		// 	co2: getImpactMetrics().co2Saved as unknown as number,
+		// 	water: getImpactMetrics().waterSaved as unknown as number,
+		// 	waste: getImpactMetrics().wasteReduced as unknown as number,
+		// });
 		toast.success("Order placed successfully!");
 
 		// This would normally be handled by the payment success callback
