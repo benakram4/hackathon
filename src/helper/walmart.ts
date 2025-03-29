@@ -30,7 +30,7 @@ export const fetchWalmartItemByQuery = async (query: string) => {
 
 		const data = await response.json();
 
-		if (!data) {
+		if (!data || !data.items) {
 			return null;
 		}
 

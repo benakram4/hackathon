@@ -187,7 +187,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 						await fetchWalmartItemByQuery(alternative);
 
 					if (!item) {
-						return [];
+						continue;
 					}
 
 					// check if we already have this item in cart
