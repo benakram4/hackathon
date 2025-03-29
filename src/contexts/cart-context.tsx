@@ -34,7 +34,8 @@ interface CartContextType {
 	updateQuantity: (productId: number, quantity: number) => void;
 	findSwapAlternatives: (
 		productUpc: string,
-	) => Promise<WalmartItemsInBulk[] | []>;
+		onProgress?: (items: WalmartItem[]) => void,
+	) => Promise<WalmartItem[] | []>;
 	swapItem: (
 		originalProductId: number,
 		alternativeProduct: WalmartItem,
@@ -145,7 +146,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 		);
 	};
 
-	const findSwapAlternatives = async (productUpc: string) => {
+	const findSwapAlternatives = async (
+		productUpc: string,
+		onProgress?: (items: WalmartItem[]) => void,
+	) => {
 		try {
 			setSwapLoading(true);
 			console.log(`finding alternatives for ${productUpc}`);
@@ -167,12 +171,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
 			console.log(`found swap item for ${productUpc}`, offSwapItems);
 
-			const walmartSwapItem: WalmartItemsInBulk[] =
-				await fetchWalmartItemsInBulk(offSwapItems);
+			const walmartSwapItems: WalmartItemsInBulk[] =
+				await fetchWalmartItemsInBulk(offSwapItems, {
+					onItemFound: (item) => {
+						if (onProgress && item.details) {
+							onProgress([item.details]);
+						}
+					},
+				});
 
-			console.log(`found alternatives for ${productUpc}`, walmartSwapItem);
+			console.log(`found alternatives for ${productUpc}`, walmartSwapItems);
 
-			return walmartSwapItem ?? [];
+			return walmartSwapItems
+				? walmartSwapItems.map((item) => item.details!).filter(Boolean)
+				: [];
 		} catch (error) {
 			console.error("Error finding swap alternatives:", error);
 			return [];

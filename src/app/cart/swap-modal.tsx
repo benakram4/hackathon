@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -30,21 +30,24 @@ const SwapModal: React.FC<SwapModalProps> = ({
 }) => {
 	const { findSwapAlternatives, swapItem, swapPreference, swapLoading } =
 		useCart();
+	const [progressiveItems, setProgressiveItems] = useState<WalmartItem[]>([]);
 
 	// Using useQuery to manage alternatives fetching
 	const {
 		data: alternatives,
+		isFetching: isAlternativesFetching,
 		isLoading: isAlternativesLoading,
 		isError: isAlternativesError,
 	} = useQuery({
 		queryKey: ["swapAlternatives", swapPreference, originalProduct.upc],
-		queryFn: () => findSwapAlternatives(originalProduct.upc),
+		queryFn: async () => {
+			setProgressiveItems([]); // Reset on new fetch
+			return await findSwapAlternatives(originalProduct.upc, (items) => {
+				setProgressiveItems((prev) => [...prev, ...items]);
+			});
+		},
 		enabled: isOpen, // Only fetch when modal is open
 		staleTime: 60 * 60 * 1000, // 1 hour cache
-		select: (data) => {
-			// filter out product details out of extra data
-			return data.map((item) => ({ ...item.details! })) as WalmartItem[];
-		},
 	});
 
 	// useEffect(() => {
@@ -111,9 +114,80 @@ const SwapModal: React.FC<SwapModalProps> = ({
 					</DialogDescription>
 				</DialogHeader>
 
-				{swapLoading ? (
-					<div className="flex justify-center py-6">
-						<Spinner className="h-10 w-10" />
+				{isAlternativesLoading && isAlternativesFetching ? (
+					<div>
+						{progressiveItems.length > 0 &&
+							progressiveItems.map((item) => (
+								<div
+									key={item.itemId}
+									className="hover:border-primary/50 hover:bg-primary/5 scroll- flex gap-3 rounded-lg border-2 p-3 transition-colors">
+									<div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded">
+										<img
+											src={item.thumbnailImage}
+											alt={item.name}
+											className="h-full w-full object-cover"
+										/>
+									</div>
+
+									<div className="flex-1">
+										<div className="flex items-start justify-between">
+											<h4 className="text-sm font-medium">{item.name}</h4>
+											{/* {alternative.sustainability.organicCertified && (
+												<Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-none text-xs">
+													<Leaf className="mr-1 h-3 w-3" />
+													Organic
+												</Badge>
+											)} */}
+											Organic or not
+										</div>
+
+										<p className="text-muted-foreground mt-1 mb-2 line-clamp-2 text-xs">
+											{item.shortDescription}
+										</p>
+
+										{/* {alternativeData && (
+											<div className="grid grid-cols-3 gap-1 text-xs">
+												<div className="flex items-center gap-1">
+													<BarChart4 className="text-primary h-3 w-3" />
+													<span>
+														{alternativeData.impactSavings.co2Reduction}
+													</span>
+												</div>
+												<div className="flex items-center gap-1">
+													<Droplets className="text-primary h-3 w-3" />
+													<span>
+														{alternativeData.impactSavings.waterSaved}
+													</span>
+												</div>
+											</div>
+										)} */}
+									</div>
+
+									<div className="flex flex-col items-end justify-between">
+										<div className="text-right">
+											<div className="font-medium">
+												${item.salePrice.toFixed(2)}
+											</div>
+											<div className="text-xs">
+												{getPriceDifference(
+													originalProduct.salePrice,
+													item.salePrice,
+												)}
+											</div>
+										</div>
+
+										<Button
+											size="sm"
+											className="mt-2"
+											onClick={() => handleSwap(item)}>
+											Swap
+										</Button>
+									</div>
+								</div>
+							))}
+						<div className="flex justify-center py-6">
+							<Spinner className="h-10 w-10" />
+						</div>
 					</div>
 				) : alternatives && alternatives?.length > 0 ? (
 					<div className="my-2 max-h-96 space-y-4 overflow-y-auto">
