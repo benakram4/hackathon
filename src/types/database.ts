@@ -25,9 +25,6 @@ export type UserOrders = {
 	swaps: OrderSwapHistory[];
 	total: number;
 	status: string;
-	co2: number;
-	waste: number;
-	water: number;
 };
 
 export type UserAddress = {
