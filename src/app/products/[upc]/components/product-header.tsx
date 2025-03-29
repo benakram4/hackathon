@@ -1,11 +1,10 @@
-import { useState } from "react";
-
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useCart } from "@/contexts/cart-context";
 import { type WalmartItem } from "@/types";
 
 export function ProductHeader({ item }: { item: WalmartItem | undefined }) {
-	const [quantity, setQuantity] = useState(1);
+	const cart = useCart();
 
 	return (
 		<div className="flex flex-col">
@@ -29,7 +28,15 @@ export function ProductHeader({ item }: { item: WalmartItem | undefined }) {
 			</ScrollArea>
 
 			<div className="flex w-full items-center space-x-4">
-				<Button className="w-full rounded-md px-4 py-2">Add to Cart</Button>
+				<Button
+					onClick={() => {
+						if (item) {
+							cart.addItem(item);
+						}
+					}}
+					className="w-full rounded-md px-4 py-2">
+					Add to Cart
+				</Button>
 			</div>
 		</div>
 	);
