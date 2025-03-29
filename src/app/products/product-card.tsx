@@ -3,11 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { useAtom } from "jotai";
 import { Heart, ShoppingCart, Star } from "lucide-react";
 
+import { favProductsAtom } from "@/atoms/fav-product";
 import { extractOffLogos } from "@/atoms/off-data";
 import { Button } from "@/components/ui/button";
+// import { shoppingCartAtom } from "@/store";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCart } from "@/contexts/cart-context";
 import type { WalmartItem } from "@/types/walmart";
 
 interface ProductCardProps {
@@ -22,6 +26,28 @@ export default function ProductCard({
 	knowledgePanelData,
 	isLoadingKnowledgePanel = false,
 }: ProductCardProps) {
+	const { items, addToCart, removeFromCart } = useCart();
+
+	const inCart = items.some((item) => item.product.itemId === product.itemId);
+
+	const [favorites, setFavorites] = useAtom(favProductsAtom);
+
+	// Check if the product is already marked as favorite based on UPC
+	const isFavorite = favorites.some((fav) => fav.walmart.upc === product.upc);
+
+	const toggleFavorite = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setFavorites((prev) => {
+			if (prev.some((fav) => fav.walmart.upc === product.upc)) {
+				// Remove the product if found in favorites
+				return prev.filter((fav) => fav.walmart.upc !== product.upc);
+			}
+			// Add new favorite; setting off data as null (adjust as needed)
+			return [...prev, { walmart: product, off: null }];
+		});
+	};
+
 	const { nutriScoreLogo, greenScoreLogo, novaGroupLogo } =
 		isLoadingKnowledgePanel
 			? {
@@ -34,14 +60,37 @@ export default function ProductCard({
 				}
 			: extractOffLogos(knowledgePanelData);
 
-	const isInStock = product.stock !== "Not available";
+	// fuck product availability
+	// const isInStock = product.stock !== "Not available";
+
+	// update cart based on product availability in cart
+	const updateCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.preventDefault();
+		e.stopPropagation();
+		if (inCart) {
+			// Remove product from cart
+			removeFromCart(product.itemId);
+			console.log("Removed from cart");
+		} else {
+			// Add to cart
+			addToCart(product);
+			console.log("added to cart");
+		}
+	};
 
 	return (
 		<div className="group border-border bg-card hover:border-primary/20 relative flex flex-col overflow-hidden rounded-xl border transition-all duration-300 hover:shadow-lg">
 			<Link href={`/products/${product.upc}`}>
 				{/* Wishlist Button */}
-				<button className="bg-background/80 hover:bg-primary/10 hover:text-primary absolute top-4 right-4 z-10 rounded-full p-2 backdrop-blur-sm transition-all">
-					<Heart className="h-5 w-5" />
+				<button
+					onClick={toggleFavorite}
+					className="bg-background/80 hover:bg-primary/10 hover:text-primary absolute top-4 right-4 z-10 rounded-full p-2 backdrop-blur-sm transition-all">
+					{/* Change icon color if favorite */}
+					<Heart
+						className={`h-5 w-5 ${
+							isFavorite ? "fill-red-500 text-red-500" : ""
+						}`}
+					/>
 				</button>
 
 				{/* Image Section */}
@@ -127,9 +176,11 @@ export default function ProductCard({
 					</div>
 					<Button
 						className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
-						disabled={!isInStock}>
+						onClick={updateCart}>
 						<ShoppingCart className="h-4 w-4" />
-						<span className="sm:block">{isInStock ? "Add" : "Sold Out"}</span>
+						<span className="sm:block">
+							{inCart ? "Remove" : "Add to Cart"}
+						</span>
 					</Button>
 				</div>
 			</Link>

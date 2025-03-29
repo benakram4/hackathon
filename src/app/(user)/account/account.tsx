@@ -18,7 +18,8 @@ type AccountSection =
 	| "orders"
 	| "impact"
 	| "rewards"
-	| "preferences";
+	| "preferences"
+	| "favorites";
 
 const Account = ({ user }: AccountProps) => {
 	const [activeSection, setActiveSection] = useState<AccountSection>("profile");

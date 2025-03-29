@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 
 import { Layout } from "@/components/layout";
+import { Toaster } from "@/components/ui/sonner";
 import Providers from "@/providers";
 
 import "./globals.css";
@@ -37,11 +38,12 @@ export default function RootLayout({
 				<link rel="icon" href="/favicon.ico" />
 			</head>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+				className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}>
 				<Providers>
 					<Layout>
 						<main className="">{children}</main>
 					</Layout>
+					<Toaster />
 				</Providers>
 			</body>
 		</html>

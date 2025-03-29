@@ -34,6 +34,7 @@ export function LoginForm() {
 								type="email"
 								name="email"
 								placeholder="m@example.com"
+								defaultValue="test@test.com"
 								required
 							/>
 						</div>
@@ -50,6 +51,7 @@ export function LoginForm() {
 								id="password"
 								type="password"
 								name="password"
+								defaultValue="123123123"
 								required
 								minLength={8}
 							/>
