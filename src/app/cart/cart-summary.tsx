@@ -55,17 +55,19 @@ const CartSummary: React.FC = () => {
 				{/* <div className="space-y-2 text-sm">
 					<div className="flex items-center gap-2">
 						<BarChart4 className="text-primary h-4 w-4" />
-						<span>You&apos;ve saved {impact.co2Saved} of emissions</span>
+						<span>You&apos;ve saved {impact.co2Saved} kg of CO2</span>
 					</div>
 
 					<div className="flex items-center gap-2">
 						<Droplets className="text-primary h-4 w-4" />
-						<span>You&apos;ve saved {impact.waterSaved} of water</span>
+						<span>You&apos;ve saved {impact.waterSaved} kg of water</span>
 					</div>
 
 					<div className="flex items-center gap-2">
 						<Trash2 className="text-primary h-4 w-4" />
-						<span>You&apos;ve reduced waste from {impact.wasteReduced}</span>
+						<span>
+							You&apos;ve reduced waste from {impact.wasteReduced} items
+						</span>
 					</div>
 				</div> */}
 				<div>impact will be mentioned here!</div>

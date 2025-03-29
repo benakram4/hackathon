@@ -204,11 +204,11 @@ const SwapModal: React.FC<SwapModalProps> = ({
 					<Button variant="ghost" size="sm" onClick={onClose}>
 						Cancel
 					</Button>
-					<Button variant="outline" size="sm" asChild>
+					{/* <Button variant="outline" size="sm" asChild>
 						<a href="#" target="_blank" rel="noopener noreferrer">
 							Learn More
 						</a>
-					</Button>
+					</Button> */}
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

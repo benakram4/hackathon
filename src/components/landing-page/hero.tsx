@@ -36,17 +36,19 @@ const Hero = () => {
 
 					{/* CTA Buttons */}
 					<div
-						className="animate-slide-up mb-16 flex flex-col items-center justify-center gap-4 sm:flex-row"
+						className="animate-slide-up mb-16 flex flex-row items-center justify-center gap-4 sm:flex-row"
 						style={{ animationDelay: "200ms" }}>
 						<Link href="/products">
 							<Button size="lg" className="group w-full sm:w-auto">
 								Shop Now
-								<ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+								<ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 sm:w-auto" />
 							</Button>
 						</Link>
-						<Button variant="outline" size="lg" className="w-full sm:w-auto">
-							Learn More
-						</Button>
+						<Link href="#alternatives">
+							<Button variant="outline" size="lg" className="sm:w-auto">
+								Learn More
+							</Button>
+						</Link>
 					</div>
 
 					{/* Benefits */}

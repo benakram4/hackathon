@@ -56,6 +56,7 @@ const Cart: React.FC = () => {
 	} = useCart();
 	const queryClient = getQueryClient();
 	const [showSecondColumn, setShowSecondColumn] = useState(false);
+	const [isSwapping, setIsSwapping] = useState(false);
 
 	// Filter items for each column
 	const originalItems = items.filter((item) => !item.swappedFor);
@@ -82,34 +83,42 @@ const Cart: React.FC = () => {
 			return;
 		}
 
-		const swappingPromises = originalItems.map(async (item) => {
-			const alternatives = await queryClient.fetchQuery({
-				queryKey: ["swapAlternatives", swapPreference, item.product.upc],
-				queryFn: () => findSwapAlternatives(item.product.upc),
-				staleTime: 60 * 60 * 1000,
+		setIsSwapping(true);
+
+		try {
+			const swappingPromises = originalItems.map(async (item) => {
+				const alternatives = await queryClient.fetchQuery({
+					queryKey: ["swapAlternatives", swapPreference, item.product.upc],
+					queryFn: () => findSwapAlternatives(item.product.upc),
+					staleTime: 60 * 60 * 1000,
+				});
+
+				// Filter out items that has no details and only once that are valid, this happens since we are expecting some of them to have null in 'details' fields
+				const filterTransform = alternatives.map((item) => ({
+					...item.details!,
+				})) as WalmartItem[];
+
+				if (filterTransform[0]) {
+					swapItem(item.product.itemId, filterTransform[0]);
+					return true;
+				}
+				return false;
 			});
 
-			// Filter out items that has no details and only once that are valid, this happens since we are expecting some of them to have null in 'details' fields
-			const filterTransform = alternatives.map((item) => ({
-				...item.details!,
-			})) as WalmartItem[];
+			const results = await Promise.all(swappingPromises);
+			const swappedCount = results.filter(Boolean).length;
 
-			if (filterTransform[0]) {
-				swapItem(item.product.itemId, filterTransform[0]);
-				return true;
+			if (swappedCount > 0) {
+				toast.success(
+					`Swapped ${swappedCount} items based on your ${swapPreference} preference`,
+				);
+			} else {
+				toast.info("No suitable alternatives found for your items");
 			}
-			return false;
-		});
-
-		const results = await Promise.all(swappingPromises);
-		const swappedCount = results.filter(Boolean).length;
-
-		if (swappedCount > 0) {
-			toast.success(
-				`Swapped ${swappedCount} items based on your ${swapPreference} preference`,
-			);
-		} else {
-			toast.info("No suitable alternatives found for your items");
+		} catch (error) {
+			toast.error("Failed to swap items. Please try again.");
+		} finally {
+			setIsSwapping(false);
 		}
 	};
 
@@ -165,8 +174,6 @@ const Cart: React.FC = () => {
 
 	return (
 		<div className="flex min-h-screen flex-col">
-			{/* <Navbar /> */}
-
 			<div className="container mx-auto flex-1 px-4 py-8">
 				<div className="mb-8">
 					<h1 className="mb-2 text-3xl font-bold">Your Cart</h1>
@@ -198,20 +205,20 @@ const Cart: React.FC = () => {
 							</div>
 						</div>
 
-						{/* Swap All Button */}
+						{/* Swap All Button with loading state */}
 						{originalItems.length > 0 && (
 							<Button
 								onClick={() => void handleSwapAll()}
+								disabled={isSwapping}
 								className="mt-3 flex items-center gap-2 md:mt-0">
-								<RefreshCw className="h-4 w-4" />
-								Swap All Items
+								<RefreshCw
+									className={`h-4 w-4 ${isSwapping ? "animate-spin" : ""}`}
+								/>
+								{isSwapping ? "Swapping..." : "Swap All Items"}
 							</Button>
 						)}
 					</div>
 				</div>
-
-				{/* Swap Page */}
-				{/* <SwapPage /> */}
 
 				{/* Main cart layout with fixed column widths */}
 				<div className="grid grid-cols-12 gap-8">
@@ -232,7 +239,7 @@ const Cart: React.FC = () => {
 
 					{/* Second Column - Swapped items */}
 					<AnimatePresence>
-						{showSecondColumn ? (
+						{showSecondColumn && swappedItems ? (
 							<motion.div
 								className="col-span-12 lg:col-span-4"
 								initial={{ opacity: 0, x: 20 }}
@@ -246,8 +253,8 @@ const Cart: React.FC = () => {
 									</div>
 
 									<div className="space-y-4">
-										{swappedItems.map((item) => (
-											<SwappedItem key={item.product.itemId} item={item} />
+										{swappedItems.map((item, index) => (
+											<SwappedItem key={index} item={item} />
 										))}
 									</div>
 								</div>

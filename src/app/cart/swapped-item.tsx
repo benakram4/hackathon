@@ -157,7 +157,7 @@ const SwappedItem: React.FC<SwappedItemProps> = ({ item }) => {
 				<div>
 					<div className="flex items-center">
 						<span className="mr-2 font-medium">
-							${item.swappedFor.salePrice.toFixed(2)}
+							${item?.swappedFor?.salePrice?.toFixed(2)}
 						</span>
 
 						{priceDifference !== 0 && (

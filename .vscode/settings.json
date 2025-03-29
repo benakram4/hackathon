@@ -13,5 +13,5 @@
 			"text": "Aspire to use the following when possible:  nextjs 15, react 19, react server component, tailwind, shadcn, react query, avoid context api prefer jotai or react query"
 		}
 	],
-	"cSpell.words": ["appwrite"]
+	"cSpell.words": ["appwrite", "uuidv"]
 }

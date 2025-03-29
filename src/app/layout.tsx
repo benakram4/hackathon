@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 
 import { Layout } from "@/components/layout";
-import { Toaster } from "@/components/ui/sonner";
 import Providers from "@/providers";
 
 import "./globals.css";
@@ -43,7 +42,6 @@ export default function RootLayout({
 					<Layout>
 						<main className="">{children}</main>
 					</Layout>
-					<Toaster />
 				</Providers>
 			</body>
 		</html>

@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 import { BarChart, Droplets, Leaf, Trash2 } from "lucide-react";
 import {
 	Bar,
@@ -24,6 +28,8 @@ import {
 } from "@/components/ui/card";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { type User } from "@/lib/auth";
+import { getUserImpact } from "@/lib/database/actions";
+import { type UserImpact } from "@/types/database";
 
 // Mock data for charts
 const monthlyImpactData = [
@@ -48,18 +54,16 @@ type ImpactSectionProps = {
 	user: User;
 };
 const ImpactSection = ({ user }: ImpactSectionProps) => {
-	const totalCO2Saved = monthlyImpactData.reduce(
-		(total, item) => total + item.co2,
-		0,
-	);
-	const totalWaterSaved = monthlyImpactData.reduce(
-		(total, item) => total + item.water,
-		0,
-	);
-	const totalWasteReduced = monthlyImpactData.reduce(
-		(total, item) => total + item.waste,
-		0,
-	);
+	const [impactData, setImpactData] = useState<UserImpact | null>(null);
+
+	useEffect(() => {
+		const fetchImpactData = async () => {
+			const data = await getUserImpact(user.$id);
+			setImpactData(data);
+		};
+
+		void fetchImpactData();
+	}, [user.$id]);
 
 	return (
 		<div className="space-y-6">
@@ -81,10 +85,11 @@ const ImpactSection = ({ user }: ImpactSectionProps) => {
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">
-							{totalCO2Saved.toFixed(1)}kg
+							{impactData?.co2.toFixed(1)}kg
 						</div>
 						<p className="text-muted-foreground text-sm">
-							Equivalent to planting ~{Math.round(totalCO2Saved / 0.5)} trees
+							Equivalent to planting{" "}
+							{impactData?.co2 ? Math.round(impactData.co2 / 0.5) : 0} trees
 						</p>
 					</CardContent>
 				</Card>
@@ -98,11 +103,11 @@ const ImpactSection = ({ user }: ImpactSectionProps) => {
 						<CardDescription>Total water conservation</CardDescription>
 					</CardHeader>
 					<CardContent>
-						<div className="text-2xl font-bold">
-							{totalWaterSaved.toFixed(0)} liters
-						</div>
+						<div className="text-2xl font-bold">{impactData?.water} liters</div>
 						<p className="text-muted-foreground text-sm">
-							Equivalent to {Math.round(totalWaterSaved / 150)} showers
+							Equivalent to{" "}
+							{impactData?.water ? Math.round(impactData.water / 150) : 0}{" "}
+							showers
 						</p>
 					</CardContent>
 				</Card>
@@ -117,10 +122,11 @@ const ImpactSection = ({ user }: ImpactSectionProps) => {
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">
-							{totalWasteReduced.toFixed(1)}kg
+							{impactData?.waste.toFixed(1)}kg
 						</div>
 						<p className="text-muted-foreground text-sm">
-							{Math.round(totalWasteReduced * 3)} less plastic items
+							{impactData?.waste ? Math.round(impactData.waste * 3) : 0} less
+							plastic items
 						</p>
 					</CardContent>
 				</Card>

@@ -22,7 +22,6 @@ export async function middleware(request: NextRequest) {
 	}
 
 	if (isProtectedRoute && user) {
-		// console.log("User found", user);
 		return NextResponse.next();
 	}
 
