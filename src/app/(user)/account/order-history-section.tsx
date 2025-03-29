@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 import { Eye, Package } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -11,48 +15,44 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { type User } from "@/lib/auth";
+import { getOrderHistory } from "@/lib/database/actions";
+import { type OrderSwapHistory, type UserOrders } from "@/types";
 
-// Mock order data
-const orders = [
-	{
-		id: "#ECO-10012",
-		date: "2023-06-15T12:30:00",
-		status: "Delivered",
-		items: 5,
-		total: 89.99,
-		swaps: 2,
-	},
-	{
-		id: "#ECO-10011",
-		date: "2023-05-20T14:45:00",
-		status: "Delivered",
-		items: 3,
-		total: 45.5,
-		swaps: 1,
-	},
-	{
-		id: "#ECO-10010",
-		date: "2023-04-05T09:15:00",
-		status: "Delivered",
-		items: 2,
-		total: 28.75,
-		swaps: 0,
-	},
-];
 type OrderHistorySectionProps = {
 	user: User;
 };
 const OrderHistorySection = ({ user }: OrderHistorySectionProps) => {
+	const [orderHistory, setOrderHistory] = useState<UserOrders[] | null>(null);
+	const [swapsHistory, setSwapsHistory] = useState<OrderSwapHistory[] | null>(
+		null,
+	);
+
+	useEffect(() => {
+		const fetchOrderHistory = async () => {
+			const data = await getOrderHistory(user.$id);
+			setOrderHistory(data);
+		};
+
+		void fetchOrderHistory();
+	}, [user.$id]);
+
+	useEffect(() => {
+		if (orderHistory) {
+			const allSwaps = orderHistory.flatMap((order) => order.swaps);
+			setSwapsHistory(allSwaps);
+		}
+	}, [orderHistory]);
+
 	return (
 		<div className="space-y-6">
 			<div className="flex items-center justify-between">
 				<h2 className="text-2xl font-bold">Order History</h2>
 				<Badge variant="outline" className="text-sm">
-					{orders.length} Orders
+					{orderHistory?.length} Orders
 				</Badge>
 			</div>
 
-			{orders.length === 0 ? (
+			{orderHistory?.length === 0 ? (
 				<div className="rounded-lg border py-12 text-center">
 					<Package className="text-muted-foreground/50 mx-auto h-12 w-12" />
 					<h3 className="mt-4 text-lg font-medium">No orders yet</h3>
@@ -76,19 +76,23 @@ const OrderHistorySection = ({ user }: OrderHistorySectionProps) => {
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{orders.map((order) => (
-								<TableRow key={order.id}>
-									<TableCell className="font-medium">{order.id}</TableCell>
+							{orderHistory?.map((order) => (
+								<TableRow key={order.$id}>
+									<TableCell className="font-medium">{order.$id}</TableCell>
 									<TableCell>
-										{new Date(order.date).toLocaleDateString()}
+										{new Date(order.$createdAt).toLocaleDateString()}
 									</TableCell>
 									<TableCell>{order.items}</TableCell>
-									<TableCell>{order.swaps}</TableCell>
+									<TableCell>{order.swaps.length}</TableCell>
 									<TableCell>${order.total.toFixed(2)}</TableCell>
 									<TableCell>
 										<Badge
 											variant={
-												order.status === "Delivered" ? "default" : "secondary"
+												order.status === "delivered"
+													? "default"
+													: order.status === "pending"
+														? "secondary"
+														: "destructive"
 											}>
 											{order.status}
 										</Badge>
@@ -120,27 +124,21 @@ const OrderHistorySection = ({ user }: OrderHistorySectionProps) => {
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							<TableRow>
-								<TableCell className="font-medium">#ECO-10012</TableCell>
-								<TableCell>Regular Beef Patties</TableCell>
-								<TableCell>Plant-Based Patties</TableCell>
-								<TableCell>-4.2kg CO2</TableCell>
-								<TableCell>Jun 15, 2023</TableCell>
-							</TableRow>
-							<TableRow>
-								<TableCell className="font-medium">#ECO-10012</TableCell>
-								<TableCell>Plastic Bottled Water</TableCell>
-								<TableCell>Filtered Tap Water</TableCell>
-								<TableCell>-0.8kg CO2</TableCell>
-								<TableCell>Jun 15, 2023</TableCell>
-							</TableRow>
-							<TableRow>
-								<TableCell className="font-medium">#ECO-10011</TableCell>
-								<TableCell>Regular Milk</TableCell>
-								<TableCell>Oat Milk</TableCell>
-								<TableCell>-1.9kg CO2</TableCell>
-								<TableCell>May 20, 2023</TableCell>
-							</TableRow>
+							{swapsHistory?.map((swap) => (
+								<TableRow key={swap.$id}>
+									<TableCell className="font-medium">
+										{/*{swap.orderId}*/}
+										{/*there is a bug with swap.orderId being undefined. showing swap.$id for now... */}
+										{swap.$id}{" "}
+									</TableCell>
+									<TableCell>{swap.originalProduct}</TableCell>
+									<TableCell>{swap.swappedProduct}</TableCell>
+									<TableCell>-{swap.co2}kg CO2</TableCell>
+									<TableCell>
+										{new Date(swap.$createdAt).toLocaleDateString()}
+									</TableCell>
+								</TableRow>
+							))}
 						</TableBody>
 					</Table>
 				</div>

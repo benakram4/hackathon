@@ -71,7 +71,9 @@ export async function deleteSession() {
 	try {
 		const { account } = await createSessionClient(sessionCookie?.value);
 		await account.deleteSession("current");
-	} catch (error) {}
+	} catch (error) {
+		console.error(error);
+	}
 
 	(await cookies()).delete("session");
 	redirect("/login");
