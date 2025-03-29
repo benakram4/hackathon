@@ -96,7 +96,9 @@ const RewardsSection = ({ user }: RewardsSectionProps) => {
 						<div className="mb-2 flex items-center gap-2">
 							<h3 className="font-semibold">{userData.tier}</h3>
 							<Progress value={nextTierProgress} className="h-2 flex-1" />
-							<h3 className="font-semibold">{userData.nextTier}</h3>
+							<h3 className="font-semibold text-yellow-400">
+								{userData.nextTier}
+							</h3>
 						</div>
 						<p className="text-muted-foreground text-sm">
 							{userData.pointsToNextTier} more points to reach{" "}
