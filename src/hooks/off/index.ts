@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { type ProductV2 } from "@/lib/off/src/main";
 import { getOffClient } from "@/providers/get-off-client";
 
 // OpenFoodFacts query keys factory

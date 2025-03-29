@@ -4,9 +4,14 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 import { toast } from "sonner";
 
+import {
+	type LocalAlternativesResponse,
+	fetchLocalAlternatives,
+} from "@/helper/gemini";
 import { fetchOffSwapItem, fetchOffWalmartItems } from "@/helper/off";
 import {
 	type WalmartItemsInBulk,
+	fetchWalmartItemByQuery,
 	fetchWalmartItemsInBulk,
 } from "@/helper/walmart";
 import { type WalmartItem } from "@/types";
@@ -33,8 +38,9 @@ interface CartContextType {
 	removeFromCart: (productId: number) => void;
 	updateQuantity: (productId: number, quantity: number) => void;
 	findSwapAlternatives: (
-		productUpc: string,
-	) => Promise<WalmartItemsInBulk[] | []>;
+		product: WalmartItem,
+		onProgress?: (items: WalmartItem[]) => void,
+	) => Promise<WalmartItem[] | [] | string>;
 	swapItem: (
 		originalProductId: number,
 		alternativeProduct: WalmartItem,
@@ -76,7 +82,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 		const savedCart = localStorage.getItem("cart");
 		if (savedCart) {
 			try {
-				console.log("loading shit");
+				console.log("loading from cart local storage");
 				setItems(JSON.parse(savedCart));
 			} catch (error) {
 				console.error("Failed to parse cart from localStorage:", error);
@@ -145,12 +151,61 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 		);
 	};
 
-	const findSwapAlternatives = async (productUpc: string) => {
+	const findSwapAlternatives = async (
+		product: WalmartItem,
+		onProgress?: (items: WalmartItem[]) => void,
+	) => {
 		try {
 			setSwapLoading(true);
-			console.log(`finding alternatives for ${productUpc}`);
+			console.log(
+				`finding alternatives for ${product.upc} with preference ${swapPreference}`,
+			);
+
+			if (swapPreference === "local") {
+				// expect product names array as response
+				const localAlternatives: LocalAlternativesResponse | null =
+					await fetchLocalAlternatives(product);
+
+				if (!localAlternatives) {
+					return [];
+				}
+
+				// here should be check for if the flag for isCanadian is true than return
+				if (localAlternatives.isCanadian) {
+					toast.error(
+						"YAYYY, what you have currently already a Canadian product!",
+					);
+					return "YAYYY, what you have currently already a Canadian product!";
+				}
+
+				// expecting to be filled with local alternatives that we can find
+				const items: WalmartItem[] = [];
+
+				for (const alternative of localAlternatives.alternative_product_names) {
+					const item: WalmartItem | null =
+						await fetchWalmartItemByQuery(alternative);
+
+					if (!item) {
+						return [];
+					}
+
+					// check if we already have this item in cart
+					if (items.find((existing) => existing.itemId === item.itemId)) {
+						console.warn(
+							`Item already in swap list: ${JSON.stringify(item)} - SKIPPING`,
+						);
+						continue;
+					}
+
+					items.push(item);
+				}
+
+				// request walmart api with product names we got as local alternatives
+				return items;
+			}
+
 			// find walmart item from off api
-			const walmartOffItem = await fetchOffWalmartItems(productUpc);
+			const walmartOffItem = await fetchOffWalmartItems(product.upc);
 
 			if (!walmartOffItem) {
 				return [];
@@ -165,14 +220,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 				return [];
 			}
 
-			console.log(`found swap item for ${productUpc}`, offSwapItems);
+			console.log(`found swap item for ${product.upc}`, offSwapItems);
 
-			const walmartSwapItem: WalmartItemsInBulk[] =
-				await fetchWalmartItemsInBulk(offSwapItems);
+			const walmartSwapItems: WalmartItemsInBulk[] =
+				await fetchWalmartItemsInBulk(offSwapItems, {
+					onItemFound: (item) => {
+						if (onProgress && item.details) {
+							onProgress([item.details]);
+						}
+					},
+				});
 
-			console.log(`found alternatives for ${productUpc}`, walmartSwapItem);
+			console.log(`found alternatives for ${product.upc}`, walmartSwapItems);
 
-			return walmartSwapItem ?? [];
+			return walmartSwapItems
+				? walmartSwapItems.map((item) => item.details!).filter(Boolean)
+				: [];
 		} catch (error) {
 			console.error("Error finding swap alternatives:", error);
 			return [];
