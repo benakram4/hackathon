@@ -1,6 +1,9 @@
+"use client";
+
 import { redirect } from "next/navigation";
 import React, { useState } from "react";
 
+import { ID } from "node-appwrite";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -15,6 +18,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCart } from "@/contexts/cart-context";
+import {
+	createUserOrdersHistory,
+	updateUserImpact,
+} from "@/lib/database/actions";
+import { type OrderSwapHistory, type UserOrders } from "@/types";
 
 import ConfettiEffect from "./confettie-effect";
 
@@ -24,14 +32,53 @@ interface CheckoutModalProps {
 }
 
 const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
-	const { items, subtotal } = useCart();
+	const { items, subtotal, getImpactMetrics } = useCart();
 	const [orderPlaced, setOrderPlaced] = useState(false);
 
-	const handleCheckout = (e: React.FormEvent) => {
+	// Demo hardcoded values
+	const orderID = ID.unique();
+	const shippingFee = 4.99;
+	const tax = subtotal * 0.13; // 13% tax
+	const total = subtotal + shippingFee + tax;
+
+	const userOrder: UserOrders = {
+		$id: orderID,
+		$createdAt: new Date().toISOString(),
+		userId: "",
+		items: items.length,
+		swaps: items
+			.map((item) => {
+				if (!item.swapType) return null;
+				const newSwap: OrderSwapHistory = {
+					$id: ID.unique(),
+					$createdAt: new Date().toISOString(),
+					orderId: orderID,
+					originalProduct: item.product.name,
+					swappedProduct: item.swappedFor?.name || "",
+					co2: 6.4, // mocked
+					waste: 5, // mocked
+					water: 3.2, // mocked
+				};
+				return newSwap;
+			})
+			.filter((swap): swap is OrderSwapHistory => swap !== null),
+		total: total,
+		status: "pending",
+	};
+
+	const handleCheckout = async (e: React.FormEvent) => {
 		e.preventDefault();
 
 		// In a real app, this would connect to a payment processor
 		setOrderPlaced(true);
+		await createUserOrdersHistory(userOrder);
+		await updateUserImpact({
+			$id: "",
+			userId: "",
+			co2: getImpactMetrics().co2Saved as unknown as number,
+			water: getImpactMetrics().waterSaved as unknown as number,
+			waste: getImpactMetrics().wasteReduced as unknown as number,
+		});
 		toast.success("Order placed successfully!");
 
 		// This would normally be handled by the payment success callback
@@ -46,11 +93,6 @@ const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 			}, 2000);
 		}, 3000);
 	};
-
-	// Demo hardcoded values
-	const shippingFee = 4.99;
-	const tax = subtotal * 0.13; // 13% tax
-	const total = subtotal + shippingFee + tax;
 
 	return (
 		<>
@@ -67,7 +109,11 @@ const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 						<DialogTitle>Checkout</DialogTitle>
 					</DialogHeader>
 
-					<form onSubmit={handleCheckout} className="space-y-6">
+					<form
+						onSubmit={(e) => {
+							void handleCheckout(e);
+						}}
+						className="space-y-6">
 						{/* Shipping Address (pre-filled for demo) */}
 						<div className="space-y-4">
 							<h3 className="font-medium">Shipping Address</h3>
