@@ -31,7 +31,7 @@ const SiteHeader = () => {
 						Alternatives
 					</a>
 					<a
-						href="#trending"
+						href="#commonly-swapped"
 						className="hover:text-primary text-sm font-medium transition-colors">
 						Trending
 					</a>

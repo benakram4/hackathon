@@ -29,7 +29,7 @@ interface CheckoutModalProps {
 }
 
 const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
-	const { items, subtotal } = useCart();
+	const { items, subtotal, clearCart } = useCart();
 	const [orderPlaced, setOrderPlaced] = useState(false);
 
 	// Demo hardcoded values
@@ -86,6 +86,7 @@ const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
 
 			// Navigate to products page after a delay
 			setTimeout(() => {
+				clearCart();
 				redirect("/products");
 			}, 2000);
 		}, 3000);
