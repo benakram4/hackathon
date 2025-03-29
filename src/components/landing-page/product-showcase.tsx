@@ -119,16 +119,7 @@ const ProductShowcase = () => {
 								className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
 							/>
 						</div>
-						<div className="mt-auto">
-							<div className="flex items-center justify-between">
-								<span className="text-lg font-semibold">
-									${currentAlternative.regularProduct.price.toFixed(2)}
-								</span>
-								<Button variant="outline" size="sm">
-									View Details
-								</Button>
-							</div>
-						</div>
+						<div className="mt-auto"></div>
 					</div>
 
 					{/* Middle - Swap arrow */}
@@ -182,14 +173,7 @@ const ProductShowcase = () => {
 								className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
 							/>
 						</div>
-						<div className="mt-auto">
-							<div className="flex items-center justify-between">
-								<span className="text-lg font-semibold">
-									${currentAlternative.sustainableAlternative.price.toFixed(2)}
-								</span>
-								<Button size="sm">Swap Now</Button>
-							</div>
-						</div>
+						<div className="mt-auto"></div>
 					</div>
 				</div>
 
