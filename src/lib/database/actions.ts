@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 
-import { Query } from "node-appwrite";
+import { ID, Query } from "node-appwrite";
 import { v4 as uuidv4 } from "uuid";
 
 import {
@@ -12,6 +12,7 @@ import {
 	type UserOrders,
 } from "@/types/database";
 
+import { getUser } from "../auth";
 import { createSessionClient } from "../server/appwrite";
 
 export async function getUserAddress(
@@ -97,7 +98,7 @@ export async function updateUserAddress(
 	}
 }
 
-export async function getImpactData(
+export async function getUserImpact(
 	userId: string,
 ): Promise<UserImpact | null> {
 	const sessionCookie = (await cookies()).get("session");
@@ -107,7 +108,7 @@ export async function getImpactData(
 		const { documents: userImpact } = await databases.listDocuments(
 			process.env.APPWRITE_DATABASE_ID as string,
 			process.env.APPWRITE_USER_IMPACT_COLLECTION_ID as string,
-			[Query.equal("user_id", userId)],
+			[Query.equal("userId", userId)],
 		);
 		// this where everything needs to be calculated
 		if (!userImpact.length) {
@@ -126,6 +127,59 @@ export async function getImpactData(
 		};
 
 		return impactData;
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
+}
+
+export async function updateUserImpact(
+	newImpact: UserImpact,
+): Promise<UserImpact | null> {
+	const sessionCookie = (await cookies()).get("session");
+
+	try {
+		const { databases } = await createSessionClient(sessionCookie?.value);
+		const { $id, ...impactData } = newImpact;
+		const user = await getUser();
+		if (!user) {
+			throw new Error("User not found");
+		}
+
+		// get current user impact data
+		const currentImpact = await getUserImpact(user.$id);
+		if (!currentImpact) {
+			throw new Error("User impact data not found");
+		}
+
+		// update the impact data with the new values
+		impactData.co2 = Number(currentImpact.co2) + Number(newImpact.co2);
+		impactData.waste = Number(currentImpact.waste) + Number(newImpact.waste);
+		impactData.water = Number(currentImpact.water) + Number(newImpact.water);
+
+		console.log("impactData", impactData);
+
+		// update the user impact data in the database
+		const { $id: documentId } = await databases.updateDocument(
+			process.env.APPWRITE_DATABASE_ID as string,
+			process.env.APPWRITE_USER_IMPACT_COLLECTION_ID as string,
+			currentImpact.$id,
+			{
+				co2: impactData.co2 as unknown as number,
+				waste: impactData.waste as unknown as number,
+				water: impactData.water as unknown as number,
+			},
+		);
+
+		const updatedImpact: UserImpact = {
+			$id: documentId,
+			userId: user.$id,
+			co2: newImpact.co2,
+			waste: newImpact.waste,
+			water: newImpact.water,
+		};
+
+		return updatedImpact;
 	} catch (error) {
 		console.error(error);
 		return null;
@@ -179,6 +233,56 @@ export async function getOrderHistory(
 		}));
 
 		return orderHistory;
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
+}
+
+export async function createUserOrdersHistory(
+	userOrder: UserOrders,
+): Promise<UserOrders | null> {
+	const sessionCookie = (await cookies()).get("session");
+
+	try {
+		const { databases } = await createSessionClient(sessionCookie?.value);
+		const { $id, swaps, ...userOrderData } = userOrder;
+		const user = await getUser();
+		if (!user) {
+			throw new Error("User not found");
+		}
+		const { $id: createdDocumentId, $createdAt: createdAt } =
+			await databases.createDocument(
+				process.env.APPWRITE_DATABASE_ID as string,
+				process.env.APPWRITE_USER_ORDERS_COLLECTION_ID as string,
+				ID.unique(),
+				{
+					...userOrderData,
+					userId: user.$id,
+					swapHistory: swaps.map((swap) => ({
+						$id: swap.$id,
+						$createdAt: swap.$createdAt,
+						userOrders: {},
+						originalProduct: swap.originalProduct,
+						swappedProduct: swap.swappedProduct,
+						co2: parseFloat(swap.co2 as unknown as string),
+						waste: parseFloat(swap.waste as unknown as string),
+						water: parseInt(swap.water as unknown as string),
+					})),
+				},
+			);
+
+		const newUserOrderHistory: UserOrders = {
+			$id: createdDocumentId,
+			$createdAt: createdAt,
+			swaps: userOrder.swaps,
+			userId: userOrder.userId,
+			items: userOrder.items,
+			total: userOrder.total,
+			status: userOrder.status,
+		};
+
+		return newUserOrderHistory;
 	} catch (error) {
 		console.error(error);
 		return null;
